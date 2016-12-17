@@ -5,7 +5,11 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "vows test/*-test.js --spec"
+  },
+  "devDependencies": {
+    "async": "0.1.x",
+    "vows": "0.5.x"
   },
   "repository": {
     "type": "git",
@@ -25,5 +29,10 @@
   "bugs": {
     "url": "https://github.com/RBische/outer-space-manager-api/issues"
   },
-  "homepage": "https://github.com/RBische/outer-space-manager-api#readme"
+  "homepage": "https://github.com/RBische/outer-space-manager-api#readme",
+  "dependencies": {
+    "body-parser": "^1.15.2",
+    "firebase-admin": "^4.0.4",
+    "jwt-simple": "^0.5.1"
+  }
 }

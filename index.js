@@ -1,7 +1,13 @@
 var express = require('express');
-var app = express();
+var router = express.Router();
+require('./response');
+
+var auth = require('./api/authRest.js');
+var app = exports.app = express();
 
 app.set('port', (process.env.PORT || 5000));
+var bodyParser = require('body-parser')
+app.use( bodyParser.json());
 
 app.use(express.static(__dirname + '/public'));
 
@@ -13,6 +19,18 @@ app.get('/', function(request, response) {
   response.render('pages/index');
 });
 
-app.listen(app.get('port'), function() {
-  console.log('Node app is running on port', app.get('port'));
+app.get('/user', function(request, response) {
+  response.render('pages/index');
 });
+
+/*
+* Routes that can be accessed by any one
+*/
+router.post('/user/login', auth.login);
+
+app.use('/', router);
+if (module.parent === null) {
+  app.listen(app.get('port'), function() {
+    console.log('Node app is running on port', app.get('port'));
+  });
+}
