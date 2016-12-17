@@ -1,6 +1,6 @@
 var admin = require("firebase-admin");
 var os = require('os');
-var private_key = process.env.FIREBASE_PRIVATE_KEY;
+var private_key = Buffer.from(process.env.FIREBASE_PRIVATE_KEY, 'base64').toString('ascii');
 var credentials = {
   "type": process.env.FIREBASE_TYPE,
   "project_id": process.env.FIREBASE_PROJECT_ID,
