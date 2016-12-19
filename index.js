@@ -3,7 +3,6 @@ var router = express.Router();
 require('./response');
 
 var auth = require('./api/authRest.js');
-var user = require('./api/userRest.js');
 var app = exports.app = express();
 
 app.set('port', (process.env.PORT || 5000));
@@ -24,15 +23,7 @@ app.get('/', function(request, response) {
 * Routes that can be accessed by any one
 */
 router.post('/api/v1/auth/login', auth.login);
-
-/*
- * Routes that can be accessed only by authenticated & authorized users
- */
-router.get('/api/v1/admin/users', user.getAll);
-router.get('/api/v1/admin/user/:id', user.getOne);
-router.post('/api/v1/admin/user/', user.create);
-router.put('/api/v1/admin/user/:id', user.update);
-router.delete('/api/v1/admin/user/:id', user.delete);
+router.post('/api/v1/auth/create', auth.create);
 
 app.use('/', router);
 if (module.parent === null) {

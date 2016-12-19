@@ -5,6 +5,58 @@ var db = admin.database();
 var ref = db.ref("outer-space-manager");
 
 var auth = {
+  create: function(req, res) {
+
+    var username = req.body.username || '';
+    var password = req.body.password || '';
+
+    if (username == '' || password == '') {
+      res.respond("Invalid request", "invalid_request", 401);
+      return;
+    }
+
+    var usersRef = ref.child("users");
+    var crypto = require('crypto');
+    var hash = crypto.createHash('sha256').update(password).digest('base64');
+
+    usersRef.orderByChild("email").equalTo(username).once("value", function(snapshot) {
+      console.log("Successfully fetched user");
+      var userFetched = snapshot.val();
+
+      if (userFetched) {
+        res.respond("Already registered email", "already_registered_email", 401);
+        return;
+      }
+      if (!userFetched) {
+        usersRef.push({email:username,
+                     password: hash});
+        res.json({code:"ok"});
+      }
+    }, function (errorObject) {
+      console.log("Error fetching user : "+errorObject);
+    });
+  },
+
+  deleteUser: function(username){
+    var usersRef = ref.child("users");
+    usersRef.orderByChild("email").equalTo(username).once("value", function(snapshot) {
+      console.log("Successfully fetched user" + snapshot.child("email").ref);
+      var userFetched = snapshot.val();
+      if (!userFetched) {
+        return;
+      }
+
+      if (userFetched) {
+        var updates = {};
+        snapshot.forEach(function(child){
+             updates[child.key] = null;
+        });
+        usersRef.update(updates);
+      }
+    }, function (errorObject) {
+      console.log("Error fetching user : "+errorObject);
+    });
+  },
 
   login: function(req, res) {
 
@@ -24,7 +76,7 @@ var auth = {
     var usersRef = ref.child("users");
     var crypto = require('crypto');
     var hash = crypto.createHash('sha256').update(password).digest('base64');
-    usersRef.orderByChild("email").equalTo(username).on("value", function(snapshot) {
+    usersRef.orderByChild("email").equalTo(username).once("value", function(snapshot) {
       console.log("Successfully fetched user");
       var userFetched = snapshot.val();
       var hashFetched = userFetched[Object.keys(userFetched)[0]].password;

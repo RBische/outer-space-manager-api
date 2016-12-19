@@ -8,10 +8,10 @@ var assert = require('assert')
       "tags":  [ "google", "search" ]
     }
   , expected_id = 1
-
+require('../api/authRest').deleteUser("alanee@osm.com");
 // Configure REST API host & URL
 require('api-easy')
-.describe('bookmarks-rest')
+.describe('auth-rest')
 .use('localhost', PORT)
 .root('/api/v1')
 .setHeader('Content-Type', 'application/json')
@@ -26,6 +26,10 @@ require('api-easy')
 .post('/auth/login', {"username":"alan@osm.com","password":"testpassword"}).expect(200)
 .next()
 .post('/auth/login', {"username":"alan@osm.com","password":"testpasswor"}).expect(401)
+.next()
+.post('/auth/create', {"username":"alanee@osm.com","password":"testpassword"}).expect(200)
+.next()
+.post('/auth/create', {"username":"alanee@osm.com","password":"testpassword"}).expect(401)
 
 // Export tests for Vows
 .export(module)
