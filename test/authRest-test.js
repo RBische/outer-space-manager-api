@@ -2,11 +2,6 @@ require('dotenv').config({verbose: true});
 const PORT = 3000;
 var assert = require('assert')
   , app = require('../index')
-  , bookmark = {
-      "title": "Google",
-      "url":   "http://www.google.com",
-      "tags":  [ "google", "search" ]
-    }
   , expected_id = 1
 require('../api/authRest').deleteUser("alanee@osm.com");
 // Configure REST API host & URL
@@ -23,6 +18,7 @@ require('api-easy')
 }).next()
 
 // 1. Test with dummy user
+.post('/auth/create', {"username":"alan@osm.com","password":"testpassword"})
 .post('/auth/login', {"username":"alan@osm.com","password":"testpassword"}).expect(200)
 .next()
 .post('/auth/login', {"username":"alan@osm.com","password":"testpasswor"}).expect(401)

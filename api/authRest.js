@@ -28,8 +28,13 @@ var auth = {
         return;
       }
       if (!userFetched) {
-        usersRef.push({email:username,
-                     password: hash});
+        usersRef.push(
+          {
+            points:0,
+            email:username,
+            password: hash
+          }
+        );
         res.json({code:"ok"});
       }
     }, function (errorObject) {
@@ -40,7 +45,6 @@ var auth = {
   deleteUser: function(username){
     var usersRef = ref.child("users");
     usersRef.orderByChild("email").equalTo(username).once("value", function(snapshot) {
-      console.log("Successfully fetched user" + snapshot.child("email").ref);
       var userFetched = snapshot.val();
       if (!userFetched) {
         return;

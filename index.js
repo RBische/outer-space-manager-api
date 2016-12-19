@@ -1,8 +1,10 @@
 var express = require('express');
 var router = express.Router();
 require('./response');
+require('./db/dbSeed').fillDb();
 
 var auth = require('./api/authRest.js');
+var buildings = require('./api/buildingRest.js');
 var app = exports.app = express();
 
 app.set('port', (process.env.PORT || 5000));
@@ -24,6 +26,7 @@ app.get('/', function(request, response) {
 */
 router.post('/api/v1/auth/login', auth.login);
 router.post('/api/v1/auth/create', auth.create);
+router.get('/api/v1/buildings', buildings.getBuildings);
 
 app.use('/', router);
 if (module.parent === null) {
