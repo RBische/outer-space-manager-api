@@ -1,3 +1,4 @@
+require('dotenv').config({verbose: true});
 const PORT = 3000;
 var assert = require('assert')
   , app = require('../index')
@@ -12,7 +13,7 @@ var assert = require('assert')
 require('api-easy')
 .describe('bookmarks-rest')
 .use('localhost', PORT)
-.root('/bookmarks')
+.root('/api/v1')
 .setHeader('Content-Type', 'application/json')
 .setHeader('Accept', 'application/json')
 
@@ -21,10 +22,10 @@ require('api-easy')
   app.app.listen(PORT);
 }).next()
 
-// Finally: clean, and stop server
-.expect('Clean & exit', function () {
-  app.db.deleteAll(function () { app.close() });
-})
+// 1. Test with dummy user
+.post('/auth/login', {"username":"alan@osm.com","password":"testpassword"}).expect(200)
+.next()
+.post('/auth/login', {"username":"alan@osm.com","password":"testpasswor"}).expect(401)
 
 // Export tests for Vows
 .export(module)

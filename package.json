@@ -10,7 +10,8 @@
   "devDependencies": {
     "async": "0.1.x",
     "vows": "0.5.x",
-    "api-easy": "0.2.x"
+    "api-easy": "0.2.x",
+    "dotenv": "2.0.0"
   },
   "repository": {
     "type": "git",
