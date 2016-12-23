@@ -118,6 +118,33 @@ var auth = {
       res.respond("Invalid credentials", "invalid_credentials", 401);
     });
   },
+
+  isAuthenticated: function (token, res) {
+    var tokensRef = ref.child("tokens");
+    console.log("Verifying token");
+    tokensRef.orderByChild("token").equalTo(token).once("value", function(snapshot) {
+      console.log("Successfully fetched tokens");
+      var tokenFetched = snapshot.val();
+      if (!tokenFetched && res) { // If authentication fails, we send a 401 back
+        console.log("No token corresponding");
+        res.respond("Invalid credentials", "invalid_credentials", 401);
+        return false;
+      }
+      if (auth.isExpired(tokenFetched.expires) && res) { // If authentication fails, we send a 401 back
+        res.respond("Expired token", "invalid_credentials", 401);
+        return false;
+      }else {
+        return true;
+      }
+    }, function (errorObject) {
+      console.log("Error fetching user : "+errorObject);
+      res.respond("Invalid credentials", "invalid_credentials", 401);
+    });
+  },
+
+  isExpired: function (expires) {
+      return expires > expiresIn(0);
+  },
 }
 
 // private method
@@ -129,8 +156,7 @@ function genToken(user) {
   var username = user[Object.keys(user)[0]].username
   return {
     token: token,
-    expires: expires,
-    user: user
+    expires: expires
   };
 }
 

@@ -24,7 +24,13 @@ require('api-easy')
   console.log(result);
 })
 .next()
-.post('/auth/login', {"username":"alan@osm.com","password":"testpassword"}).expect(200)
+.post('/auth/login', {"username":"alan@osm.com","password":"testpassword"})
+.expect(200)
+.expect('Token retrieved should not be expired', function (err, res, body) {
+  var result = JSON.parse(body);
+  assert.ok(!require("../api/authRest").isAuthenticated(result.token, null), 'The token is expired');
+  console.log(result);
+})
 .next()
 .post('/auth/login', {"username":"alan@osm.com","password":"testpasswor"}).expect(401)
 .next()
