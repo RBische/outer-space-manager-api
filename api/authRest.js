@@ -1,4 +1,4 @@
-var jwt = require('jwt-simple');
+var jwt = require('jsonwebtoken');
 var admin = require('../db/db');
 // As an admin, the app has access to read and write all data, regardless of Security Rules
 var db = admin.database();
@@ -28,7 +28,7 @@ var auth = {
         return;
       }
       if (!userFetched) {
-        var refreshToken = jwt.encode({
+        var refreshToken = jwt.sign({
           refresh: username + "refreshToken"
         }, process.env.APP_SECRET);
         usersRef.push(
@@ -102,21 +102,26 @@ var auth = {
       if (userFetched) {
         // If authentication is success, we will generate a token
         // and dispatch it to the client
-        var token = genToken(userFetched);
-        var tokensRef = ref.child("tokens");
-        tokensRef.push(
-          {
-            username: username,
-            token: token.token,
-            expires: token.expires
-          }
-        );
+        var token = auth.pushToken(username);
         res.json(token);
       }
     }, function (errorObject) {
       console.log("Error fetching user : "+errorObject);
       res.respond("Invalid credentials", "invalid_credentials", 401);
     });
+  },
+
+  pushToken: function(username) {
+    var token = genToken();
+    var tokensRef = ref.child("tokens");
+    tokensRef.push(
+      {
+        username: username,
+        token: token.token,
+        expires: token.expires
+      }
+    );
+    return token;
   },
 
   isAuthenticated: function (token, res) {
@@ -148,12 +153,11 @@ var auth = {
 }
 
 // private method
-function genToken(user) {
+function genToken() {
   var expires = expiresIn(7); // 7 days
-  var token = jwt.encode({
+  var token = jwt.sign({
     exp: expires
   }, process.env.APP_SECRET);
-  var username = user[Object.keys(user)[0]].username
   return {
     token: token,
     expires: expires

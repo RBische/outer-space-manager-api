@@ -2,10 +2,11 @@ require('dotenv').config({verbose: true});
 const PORT = 3001;
 var assert = require('assert')
   , app = require('../index')
-  , expected_id = 1
+  , expected_id = 1;
+var token = require('../api/authRest').pushToken("alane@osm.com");
 // Configure REST API host & URL
 require('api-easy')
-.describe('auth-rest')
+.describe('building-rest')
 .use('localhost', PORT)
 .root('/api/v1')
 .setHeader('Content-Type', 'application/json')
@@ -15,7 +16,7 @@ require('api-easy')
 .expect('Start server', function () {
   app.app.listen(PORT);
 }).next()
-
+.setHeader('x-access-token', token.token)
 // 1. Get list of buildings
 .get('/buildings')
 .expect(200)
