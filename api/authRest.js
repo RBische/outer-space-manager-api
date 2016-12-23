@@ -28,9 +28,13 @@ var auth = {
         return;
       }
       if (!userFetched) {
+        var refreshToken = jwt.encode({
+          refresh: username + "refreshToken"
+        }, process.env.APP_SECRET);
         usersRef.push(
           {
             points:0,
+            refreshToken: refreshToken,
             email:username,
             password: hash
           }
@@ -80,11 +84,17 @@ var auth = {
     var usersRef = ref.child("users");
     var crypto = require('crypto');
     var hash = crypto.createHash('sha256').update(password).digest('base64');
+    console.log("Loging in");
     usersRef.orderByChild("email").equalTo(username).once("value", function(snapshot) {
-      console.log("Successfully fetched user");
+      console.log("Successfully fetched user for login");
       var userFetched = snapshot.val();
+      if (!userFetched) { // If authentication fails, we send a 401 back
+        console.log("Current user fetched for validation: "+userFetched);
+        res.respond("Invalid credentials", "invalid_credentials", 401);
+        return;
+      }
       var hashFetched = userFetched[Object.keys(userFetched)[0]].password;
-      if (!userFetched || hashFetched != hash) { // If authentication fails, we send a 401 back
+      if (hashFetched != hash) { // If authentication fails, we send a 401 back
         res.respond("Invalid credentials", "invalid_credentials", 401);
         return;
       }
@@ -92,7 +102,16 @@ var auth = {
       if (userFetched) {
         // If authentication is success, we will generate a token
         // and dispatch it to the client
-        res.json(genToken(userFetched));
+        var token = genToken(userFetched);
+        var tokensRef = ref.child("tokens");
+        tokensRef.push(
+          {
+            username: username,
+            token: token.token,
+            expires: token.expires
+          }
+        );
+        res.json(token);
       }
     }, function (errorObject) {
       console.log("Error fetching user : "+errorObject);
@@ -107,7 +126,7 @@ function genToken(user) {
   var token = jwt.encode({
     exp: expires
   }, process.env.APP_SECRET);
-
+  var username = user[Object.keys(user)[0]].username
   return {
     token: token,
     expires: expires,

@@ -19,6 +19,11 @@ require('api-easy')
 
 // 1. Test with dummy user
 .post('/auth/create', {"username":"alan@osm.com","password":"testpassword"})
+.expect('Should correctly create the user', function (err, res, body) {
+  var result = JSON.parse(body);
+  console.log(result);
+})
+.next()
 .post('/auth/login', {"username":"alan@osm.com","password":"testpassword"}).expect(200)
 .next()
 .post('/auth/login', {"username":"alan@osm.com","password":"testpasswor"}).expect(401)
