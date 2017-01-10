@@ -37,14 +37,20 @@ require('api-easy')
 })
 .next()
 // 3. Builds a build for a specific user
-.post('/buildings/create/1',{})
+.post('/buildings/create/0',{})
 .expect(401)
 .next()
 .expect('Giving resources', function () {
   require('../api/userRest').giveResources("alan", 400, 400);
 }).next()
-.post('/buildings/create/1',{})
+.post('/buildings/create/0',{})
 .expect(200)
+.next()
+.expect('Removing resources', function () {
+  require('../api/userRest').giveResources("alan", -400, -400);
+}).next()
+.post('/buildings/create/0',{})
+.expect(401)
 .next()
 
 // Export tests for Vows
