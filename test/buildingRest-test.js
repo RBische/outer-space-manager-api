@@ -4,6 +4,7 @@ var assert = require('assert')
   , app = require('../index')
   , expected_id = 1;
 var token = require('../api/authRest').pushToken("alane@osm.com");
+require('../api/buildingRest').addBuilding("alan", 0);
 // Configure REST API host & URL
 require('api-easy')
 .describe('building-rest')
@@ -19,6 +20,14 @@ require('api-easy')
 .setHeader('x-access-token', token.token)
 // 1. Get list of buildings
 .get('/buildings')
+.expect(200)
+.expect('Should have more than zero buildings', function (err, res, body) {
+  var result = JSON.parse(body);
+  assert.ok(result.buildings.length > 0, 'The list does not contains buildings');
+})
+.next()
+// 2. Get list for the alan
+.get('/buildings/list/alan')
 .expect(200)
 .expect('Should have more than zero buildings', function (err, res, body) {
   var result = JSON.parse(body);

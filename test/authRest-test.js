@@ -3,7 +3,7 @@ const PORT = 3000;
 var assert = require('assert')
   , app = require('../index')
   , expected_id = 1
-require('../api/authRest').deleteUser("alanee@osm.com");
+require('../api/authRest').deleteUser("alanee");
 // Configure REST API host & URL
 require('api-easy')
 .describe('auth-rest')
@@ -18,13 +18,17 @@ require('api-easy')
 }).next()
 
 // 1. Test with dummy user
-.post('/auth/create', {"username":"alan@osm.com","password":"testpassword"})
+.post('/auth/create', {"username":"alan","password":"testpassword"})
 .expect('Should correctly create the user', function (err, res, body) {
   var result = JSON.parse(body);
   console.log(result);
 })
 .next()
-.post('/auth/login', {"username":"alan@osm.com","password":"testpassword"})
+// No special chars accepted
+.post('/auth/create', {"username":"alan¨è","password":"testpassword"})
+.expect(401)
+.next()
+.post('/auth/login', {"username":"alan","password":"testpassword"})
 .expect(200)
 .expect('Token retrieved should not be expired', function (err, res, body) {
   var result = JSON.parse(body);
@@ -32,11 +36,11 @@ require('api-easy')
   console.log(result);
 })
 .next()
-.post('/auth/login', {"username":"alan@osm.com","password":"testpasswor"}).expect(401)
+.post('/auth/login', {"username":"alan","password":"testpasswor"}).expect(401)
 .next()
-.post('/auth/create', {"username":"alanee@osm.com","password":"testpassword"}).expect(200)
+.post('/auth/create', {"username":"alanee","password":"testpassword"}).expect(200)
 .next()
-.post('/auth/create', {"username":"alanee@osm.com","password":"testpassword"}).expect(401)
+.post('/auth/create', {"username":"alanee","password":"testpassword"}).expect(401)
 
 // Export tests for Vows
 .export(module)

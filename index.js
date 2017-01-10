@@ -59,6 +59,7 @@ router.use(function(req, res, next) {
   }
 });
 router.get('/api/v1/buildings', buildings.getBuildings);
+router.get('/api/v1/buildings/list/:username', buildings.getBuildingsForUser);
 
 app.use('/', router);
 if (module.parent === null) {

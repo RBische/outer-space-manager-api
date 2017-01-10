@@ -15,27 +15,34 @@ var auth = {
       return;
     }
 
+    var re = new RegExp('^\s*([0-9a-zA-Z]+)\s*$');
+    if (!re.test(username)) {
+      console.log("Special chars");
+      res.respond("Invalid request, username must not contains special chars", "invalid_request", 401);
+      return;
+    }
+
     var usersRef = ref.child("users");
     var crypto = require('crypto');
     var hash = crypto.createHash('sha256').update(password).digest('base64');
 
-    usersRef.orderByChild("email").equalTo(username).once("value", function(snapshot) {
+    usersRef.orderByChild("username").equalTo(username).once("value", function(snapshot) {
       console.log("Successfully fetched user");
       var userFetched = snapshot.val();
 
       if (userFetched) {
-        res.respond("Already registered email", "already_registered_email", 401);
+        res.respond("Already registered username", "already_registered_username", 401);
         return;
       }
       if (!userFetched) {
         var refreshToken = jwt.sign({
           refresh: username + "refreshToken"
         }, process.env.APP_SECRET);
-        usersRef.push(
+        usersRef.child(username).update(
           {
             points:0,
             refreshToken: refreshToken,
-            email:username,
+            username:username,
             password: hash
           }
         );
@@ -48,7 +55,7 @@ var auth = {
 
   deleteUser: function(username){
     var usersRef = ref.child("users");
-    usersRef.orderByChild("email").equalTo(username).once("value", function(snapshot) {
+    usersRef.orderByChild("username").equalTo(username).once("value", function(snapshot) {
       var userFetched = snapshot.val();
       if (!userFetched) {
         return;
@@ -85,7 +92,7 @@ var auth = {
     var crypto = require('crypto');
     var hash = crypto.createHash('sha256').update(password).digest('base64');
     console.log("Loging in");
-    usersRef.orderByChild("email").equalTo(username).once("value", function(snapshot) {
+    usersRef.orderByChild("username").equalTo(username).once("value", function(snapshot) {
       console.log("Successfully fetched user for login");
       var userFetched = snapshot.val();
       if (!userFetched) { // If authentication fails, we send a 401 back
