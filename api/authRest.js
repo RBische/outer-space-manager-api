@@ -41,6 +41,8 @@ var auth = {
         usersRef.child(username).update(
           {
             points:0,
+            minerals:0,
+            gas:0,
             refreshToken: refreshToken,
             username:username,
             password: hash

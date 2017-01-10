@@ -3,12 +3,16 @@ var router = express.Router();
 var jwt = require('jsonwebtoken');
 require('./response');
 require('./db/dbSeed').fillDb();
+var admin = require('./db/db');
+// As an admin, the app has access to read and write all data, regardless of Security Rules
+var db = admin.database();
+var ref = db.ref("outer-space-manager");
 
 var auth = require('./api/authRest.js');
 var buildings = require('./api/buildingRest.js');
 var app = exports.app = express();
 
-app.set('port', (process.env.PORT || 5000));
+app.set('port', (process.env.PORT || 6000));
 var bodyParser = require('body-parser')
 app.use( bodyParser.json());
 
@@ -33,7 +37,6 @@ router.use(function(req, res, next) {
 
   // check header or url parameters or post parameters for token
   var token = req.body.token || req.query.token || req.headers['x-access-token'];
-
   // decode token
   if (token) {
 
@@ -45,7 +48,28 @@ router.use(function(req, res, next) {
       } else {
         // if everything is good, save to request for use in other routes
         req.decoded = decoded;
-        next();
+        ref.child('tokens').orderByChild("token").equalTo(token).once("value", function(snapshot) {
+          var tokenFetched = snapshot.val();
+          if (tokenFetched == null){
+            res.respond("No token corresponding found", "invalid_access_token", 403);
+            return;
+          }
+          var username = tokenFetched[Object.keys(tokenFetched)[0]].username;
+          var userRef = ref.child("users/"+username);
+          userRef.once("value", function(snapshot) {
+            var userFetched = snapshot.val();
+            if (userFetched == null){
+              res.respond("No user corresponding found", "invalid_access_token", 403);
+              return;
+            }
+            req.user = userFetched;
+            next();
+          }, function (errorObject) {
+            res.respond("Oups, server is not that ok with your request", "server_bad_response", 500);
+          });
+        }, function (errorObject) {
+          res.respond("Oups, server is not that ok with your request", "server_bad_response", 500);
+        });
       }
     });
 
@@ -60,6 +84,7 @@ router.use(function(req, res, next) {
 });
 router.get('/api/v1/buildings', buildings.getBuildings);
 router.get('/api/v1/buildings/list/:username', buildings.getBuildingsForUser);
+router.post('/api/v1/buildings/create/:buildingId', buildings.createBuildingForUser);
 
 app.use('/', router);
 if (module.parent === null) {

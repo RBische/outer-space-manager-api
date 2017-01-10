@@ -3,8 +3,7 @@ const PORT = 3001;
 var assert = require('assert')
   , app = require('../index')
   , expected_id = 1;
-var token = require('../api/authRest').pushToken("alane@osm.com");
-require('../api/buildingRest').addBuilding("alan", 0);
+var token = require('../api/authRest').pushToken("alan");
 // Configure REST API host & URL
 require('api-easy')
 .describe('building-rest')
@@ -16,6 +15,9 @@ require('api-easy')
 // Initially: start server
 .expect('Start server', function () {
   app.app.listen(PORT);
+}).next()
+.expect('Creating building', function () {
+  require('../api/buildingRest').addBuilding("alan", 0);
 }).next()
 .setHeader('x-access-token', token.token)
 // 1. Get list of buildings
@@ -33,6 +35,16 @@ require('api-easy')
   var result = JSON.parse(body);
   assert.ok(result.buildings.length > 0, 'The list does not contains buildings');
 })
+.next()
+// 3. Builds a build for a specific user
+.post('/buildings/create/1',{})
+.expect(401)
+.next()
+.expect('Giving resources', function () {
+  require('../api/userRest').giveResources("alan", 400, 400);
+}).next()
+.post('/buildings/create/1',{})
+.expect(200)
 .next()
 
 // Export tests for Vows

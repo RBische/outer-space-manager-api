@@ -15,8 +15,10 @@ var seed = {
         "amountOfEffectLevel0":100,
         "timeToBuildByLevel":200,
         "timeToBuildLevel0":60,
-        "costByLevel":200,
-        "costLevel0":100
+        "mineralCostByLevel":200,
+        "mineralCostLevel0":100,
+        "gasCostByLevel":200,
+        "gasCostLevel0":100
       },
       1:{
         "name": "Spatioport",
@@ -25,8 +27,10 @@ var seed = {
         "amountOfEffectLevel0":100,
         "timeToBuildByLevel":200,
         "timeToBuildLevel0":60,
-        "costByLevel":200,
-        "costLevel0":100
+        "mineralCostByLevel":200,
+        "mineralCostLevel0":100,
+        "gasCostByLevel":200,
+        "gasCostLevel0":100
       }
     }
     );
