@@ -1,5 +1,6 @@
 var admin = require('../db/db');
 var userRest = require('../api/userRest');
+var queueHelper = require('../db/queueHelper');
 // As an admin, the app has access to read and write all data, regardless of Security Rules
 var db = admin.database();
 var ref = db.ref("outer-space-manager");
@@ -65,11 +66,22 @@ var building = {
         if (buildingFetched) {
           var userBuildingsFetched = snapshot.val();
           var futureLevel = buildingFetched.level + 1;
-          var mineralCost = buildingFetched.mineralCostByLevel*buildingFetched.level+buildingFetched.mineralCostLevel0;
+          console.log("Building future level: " + futureLevel);
+          var mineralCost = buildingFetched.mineralCostByLevel*(futureLevel-1)+buildingFetched.mineralCostLevel0;
+          console.log("Mineral cost " + buildingFetched.mineralCostByLevel*futureLevel);
           var gasCost = buildingFetched.gasCostByLevel*buildingFetched.level+buildingFetched.gasCostLevel0;
           if (userRest.hasSufficientResources(user.minerals, user.gas, mineralCost, gasCost)){
-            //TODO: remove resources used + add to queue
-            res.json({code:"ok"});
+            console.log("Using minerals " + user.minerals);
+            console.log("Current minerals : " + user.minerals + " And after : " + (user.minerals - mineralCost));
+            userRest.changeResources(user.username, -mineralCost, -gasCost);
+            console.log("Minerals transaction done");
+            var executionTime = buildingFetched.timeToBuildByLevel*buildingFetched.level+buildingFetched.timeToBuildLevel0 + Date.now();
+            buildingFetched.level = futureLevel;
+            queueHelper.addToQueue("buildings", buildingFetched, req.params.buildingId, executionTime,
+              function (){
+                res.json({code:"ok"});
+              }
+            );
           }else{
             res.respond("Not enough resources", "not_enough_resources", 401);
             return;

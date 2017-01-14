@@ -41,14 +41,11 @@ require('api-easy')
 .expect(401)
 .next()
 .expect('Giving resources', function () {
-  require('../api/userRest').giveResources("alan", 400, 400);
+  require('../api/userRest').changeResources("alan", 300, 300);
 }).next()
 .post('/buildings/create/0',{})
 .expect(200)
 .next()
-.expect('Removing resources', function () {
-  require('../api/userRest').giveResources("alan", -400, -400);
-}).next()
 .post('/buildings/create/0',{})
 .expect(401)
 .next()

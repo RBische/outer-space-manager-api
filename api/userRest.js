@@ -7,7 +7,7 @@ var user = {
   hasSufficientResources: function(userMineral, userGas, mineral, gas){
     return userMineral>=mineral&&userGas>=gas;
   },
-  giveResources: function(username, minerals, gas){
+  changeResources: function(username, minerals, gas){
     var userRef = ref.child("users/"+username);
     userRef.once("value", function(snapshot) {
       var userFetched = snapshot.val();
