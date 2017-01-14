@@ -53,6 +53,7 @@ var building = {
     }
   },
   createBuildingForUser: function(req, res){
+    //TODO: verify already building
     if (req.user!=undefined || req.user.username!=undefined || req.params.buildingId!=undefined){
       var user = req.user;
       var buildingsRef = ref.child("users/"+user.username+"/buildings/"+req.params.buildingId);
@@ -71,18 +72,29 @@ var building = {
           console.log("Mineral cost " + buildingFetched.mineralCostByLevel*(futureLevel-1));
           var gasCost = buildingFetched.gasCostByLevel*buildingFetched.level+buildingFetched.gasCostLevel0;
           if (userRest.hasSufficientResources(user.minerals, user.gas, mineralCost, gasCost)){
-            console.log("Using minerals " + user.minerals);
-            console.log("Current minerals : " + user.minerals + " And after : " + (user.minerals - mineralCost));
-            userRest.changeResources(user.username, -mineralCost, -gasCost);
-            console.log("Minerals transaction done");
-            var executionTime = (buildingFetched.timeToBuildByLevel*buildingFetched.level+buildingFetched.timeToBuildLevel0) * 1000 + Date.now();
-            console.log("Building will be ok at : " + executionTime + " It is now : " + Date.now());
-            buildingFetched.level = futureLevel;
-            queueHelper.addToQueue("buildings", buildingFetched, "users/" + user.username + "/buildings/" + req.params.buildingId, executionTime,
-              function (){
-                res.json({code:"ok"});
-              }
-            );
+            console.log("Is building : " + buildingFetched.building);
+            if (!buildingFetched.building){
+              console.log("Using minerals " + user.minerals);
+              console.log("Current minerals : " + user.minerals + " And after : " + (user.minerals - mineralCost));
+              userRest.changeResources(user.username, -mineralCost, -gasCost);
+              console.log("Minerals transaction done");
+              var executionTime = (buildingFetched.timeToBuildByLevel*buildingFetched.level+buildingFetched.timeToBuildLevel0) * 1000 + Date.now();
+              console.log("Building will be ok at : " + executionTime + " It is now : " + Date.now());
+              buildingFetched.level = futureLevel;
+              ref.child("users/"+user.username+"/buildings/"+req.params.buildingId).update({building:true},
+                function(){
+                  buildingFetched.building = false;
+                  queueHelper.addToQueue("buildings", buildingFetched, "users/" + user.username + "/buildings/" + req.params.buildingId, executionTime, user.username,
+                    function (){
+                      res.json({code:"ok"});
+                    }
+                  );
+                }
+              );
+            }else{
+              res.respond("Building already in queue", "already_in_queue", 401);
+              return;
+            }
           }else{
             res.respond("Not enough resources", "not_enough_resources", 401);
             return;

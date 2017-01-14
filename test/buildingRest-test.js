@@ -48,6 +48,22 @@ require('api-easy')
 .next()
 .post('/buildings/create/0',{})
 .expect(401)
+.expect('Should have not_enough_resources code', function (err, res, body) {
+  var result = JSON.parse(body);
+  console.log(body);
+  assert.ok(result.internalCode == "not_enough_resources");
+})
+.next()
+.expect('Giving resources', function () {
+  require('../api/userRest').changeResources("alan", 300, 300);
+}).next()
+.post('/buildings/create/0',{})
+.expect(401)
+.expect('Should have already_in_queue code', function (err, res, body) {
+  var result = JSON.parse(body);
+  console.log(body);
+  assert.ok(result.internalCode == "already_in_queue");
+})
 .next()
 
 // Export tests for Vows

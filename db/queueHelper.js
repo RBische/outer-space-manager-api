@@ -4,13 +4,14 @@ var queueRef = db.ref("outer-space-manager/queue");
 var ref = db.ref("outer-space-manager");
 
 var queue = {
-  addToQueue: function(objectType, object, key, executionTime, callback) {
+  addToQueue: function(objectType, object, key, executionTime, username, callback) {
     queueRef.child((executionTime)).update(
       {
         objectType:objectType,
         object:object,
         key:key,
-        executionTime: executionTime
+        executionTime: executionTime,
+        username: username
       }, function(error) {
         if (error) {
           console.log("Data in queue could not be saved." + error);
@@ -20,6 +21,17 @@ var queue = {
         callback();
       }
     );
+  },
+  clearQueue: function() {
+    queueRef.remove();
+  },
+  deleteQueueForUser: function() {
+    queueRef.orderByChild("username").equalTo(username).once("value", function(snapshot) {
+      var userFetched = snapshot.val();
+      snapshot.forEach(function(child){
+        child.remove();
+      });
+    });
   },
   executeQueue: function(callback) {
       queueRef.orderByKey().once("value", function(snapshot) {

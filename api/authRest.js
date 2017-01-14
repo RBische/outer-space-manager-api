@@ -56,23 +56,8 @@ var auth = {
   },
 
   deleteUser: function(username){
-    var usersRef = ref.child("users");
-    usersRef.orderByChild("username").equalTo(username).once("value", function(snapshot) {
-      var userFetched = snapshot.val();
-      if (!userFetched) {
-        return;
-      }
-
-      if (userFetched) {
-        var updates = {};
-        snapshot.forEach(function(child){
-             updates[child.key] = null;
-        });
-        usersRef.update(updates);
-      }
-    }, function (errorObject) {
-      console.log("Error fetching user : "+errorObject);
-    });
+    var usersRef = ref.child("users/"+username);
+    usersRef.remove();
   },
 
   login: function(req, res) {
