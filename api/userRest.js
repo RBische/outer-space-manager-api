@@ -13,7 +13,6 @@ var user = {
       var userFetched = snapshot.val();
       userFetched.minerals = userFetched.minerals + minerals;
       userFetched.gas = userFetched.gas + gas;
-      console.log(JSON.stringify(userFetched));
       ref.child("users/"+username).update(userFetched);
     }, function (errorObject) {
       console.log("Error giving resources");
