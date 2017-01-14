@@ -3,6 +3,7 @@ var router = express.Router();
 var jwt = require('jsonwebtoken');
 require('./response');
 require('./db/dbSeed').fillDb();
+var queueHelper = require('./db/queueHelper');
 var admin = require('./db/db');
 // As an admin, the app has access to read and write all data, regardless of Security Rules
 var db = admin.database();
@@ -63,7 +64,9 @@ router.use(function(req, res, next) {
               return;
             }
             req.user = userFetched;
-            next();
+            queueHelper.executeQueue(function (){
+              next();
+            });
           }, function (errorObject) {
             res.respond("Oups, server is not that ok with your request", "server_bad_response", 500);
           });

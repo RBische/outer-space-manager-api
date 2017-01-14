@@ -1,6 +1,7 @@
 var admin = require('../db/db');
 var db = admin.database();
 var queueRef = db.ref("outer-space-manager/queue");
+var ref = db.ref("outer-space-manager");
 
 var queue = {
   addToQueue: function(objectType, object, key, executionTime, callback) {
@@ -19,6 +20,53 @@ var queue = {
         callback();
       }
     );
+  },
+  executeQueue: function(callback) {
+      queueRef.orderByKey().once("value", function(snapshot) {
+        var queueItems = snapshot.val();
+        if (!queueItems) {
+          callback();
+        }
+        if (queueItems) {
+          executeItems(Object.values(queueItems), function(){
+            callback();
+          });
+        }
+      }, function (errorObject) {
+        callback();
+      });
+  }
+}
+
+function executeItems(items, callback){
+  if (items.length>0){
+    var currentItem = items.shift();
+    if (currentItem.executionTime <= Date.now()){
+      console.log("Executing item : " + currentItem.executionTime);
+      var refToUpdate = ref.child(currentItem.key).update(
+        currentItem.object, function(error) {
+          if (error) {
+            console.log("Data in queue could not be executed." + error);
+          } else {
+            console.log("Data in queue executed successfully.");
+          }
+          queueRef.child("" + currentItem.executionTime).remove(
+            function(error) {
+              if (error) {
+                console.log("Data in queue could not be remove." + error);
+              } else {
+                console.log("Data in queue removed successfully.");
+              }
+              executeItems(items, callback);
+            }
+          );
+        }
+      );
+    }else{
+      callback();
+    }
+  }else {
+    callback();
   }
 }
 

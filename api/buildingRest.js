@@ -75,9 +75,10 @@ var building = {
             console.log("Current minerals : " + user.minerals + " And after : " + (user.minerals - mineralCost));
             userRest.changeResources(user.username, -mineralCost, -gasCost);
             console.log("Minerals transaction done");
-            var executionTime = buildingFetched.timeToBuildByLevel*buildingFetched.level+buildingFetched.timeToBuildLevel0 + Date.now();
+            var executionTime = (buildingFetched.timeToBuildByLevel*buildingFetched.level+buildingFetched.timeToBuildLevel0) * 1000 + Date.now();
+            console.log("Building will be ok at : " + executionTime + " It is now : " + Date.now());
             buildingFetched.level = futureLevel;
-            queueHelper.addToQueue("buildings", buildingFetched, req.params.buildingId, executionTime,
+            queueHelper.addToQueue("buildings", buildingFetched, "users/" + user.username + "/buildings/" + req.params.buildingId, executionTime,
               function (){
                 res.json({code:"ok"});
               }
