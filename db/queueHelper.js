@@ -28,7 +28,7 @@ var queue = {
           callback();
         }
         if (queueItems) {
-          executeItems(Object.values(queueItems), function(){
+          executeItems(Object.keys(queueItems), queueItems, function(){
             callback();
           });
         }
@@ -38,9 +38,10 @@ var queue = {
   }
 }
 
-function executeItems(items, callback){
-  if (items.length>0){
-    var currentItem = items.shift();
+function executeItems(keys, items, callback){
+  if (keys.length>0){
+    var currentKey = keys.shift();
+    var currentItem = items[currentKey];
     if (currentItem.executionTime <= Date.now()){
       console.log("Executing item : " + currentItem.executionTime);
       var refToUpdate = ref.child(currentItem.key).update(
@@ -57,7 +58,7 @@ function executeItems(items, callback){
               } else {
                 console.log("Data in queue removed successfully.");
               }
-              executeItems(items, callback);
+              executeItems(keys, items, callback);
             }
           );
         }

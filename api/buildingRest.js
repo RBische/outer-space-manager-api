@@ -68,7 +68,7 @@ var building = {
           var futureLevel = buildingFetched.level + 1;
           console.log("Building future level: " + futureLevel);
           var mineralCost = buildingFetched.mineralCostByLevel*(futureLevel-1)+buildingFetched.mineralCostLevel0;
-          console.log("Mineral cost " + buildingFetched.mineralCostByLevel*futureLevel);
+          console.log("Mineral cost " + buildingFetched.mineralCostByLevel*(futureLevel-1));
           var gasCost = buildingFetched.gasCostByLevel*buildingFetched.level+buildingFetched.gasCostLevel0;
           if (userRest.hasSufficientResources(user.minerals, user.gas, mineralCost, gasCost)){
             console.log("Using minerals " + user.minerals);
