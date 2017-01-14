@@ -10,6 +10,7 @@ var db = admin.database();
 var ref = db.ref("outer-space-manager");
 
 var auth = require('./api/authRest.js');
+var userRest = require('./api/userRest.js');
 var buildings = require('./api/buildingRest.js');
 var app = exports.app = express();
 
@@ -55,20 +56,22 @@ router.use(function(req, res, next) {
             res.respond("No token corresponding found", "invalid_access_token", 403);
             return;
           }
-          var username = tokenFetched[Object.keys(tokenFetched)[0]].username;
-          var userRef = ref.child("users/"+username);
-          userRef.once("value", function(snapshot) {
-            var userFetched = snapshot.val();
-            if (userFetched == null){
-              res.respond("No user corresponding found", "invalid_access_token", 403);
-              return;
-            }
-            req.user = userFetched;
-            queueHelper.executeQueue(function (){
-              next();
+          queueHelper.executeQueue(function (){
+            var username = tokenFetched[Object.keys(tokenFetched)[0]].username;
+            var userRef = ref.child("users/"+username);
+            userRef.once("value", function(snapshot) {
+              var userFetched = snapshot.val();
+              if (userFetched == null){
+                res.respond("No user corresponding found", "invalid_access_token", 403);
+                return;
+              }
+              userRest.refreshResources(userFetched, function(user){
+                req.user = user;
+                next();
+              });
+            }, function (errorObject) {
+              res.respond("Oups, server is not that ok with your request", "server_bad_response", 500);
             });
-          }, function (errorObject) {
-            res.respond("Oups, server is not that ok with your request", "server_bad_response", 500);
           });
         }, function (errorObject) {
           res.respond("Oups, server is not that ok with your request", "server_bad_response", 500);

@@ -45,7 +45,10 @@ var auth = {
             gas:0,
             refreshToken: refreshToken,
             username:username,
-            password: hash
+            password: hash,
+            mineralsModifier: 1,
+            gasModifier: 1,
+            lastResourcesRefresh: Date.now()
           }
         );
         res.json({code:"ok"});
