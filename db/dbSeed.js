@@ -11,8 +11,8 @@ var seed = {
       0:{
         "name": "Centrale électrique",
         "effect":"speed_building",
-        "amountOfEffectByLevel":100,
-        "amountOfEffectLevel0":100,
+        "amountOfEffectByLevel":30,
+        "amountOfEffectLevel0":0,
         "timeToBuildByLevel":200,
         "timeToBuildLevel0":60,
         "mineralCostByLevel":200,

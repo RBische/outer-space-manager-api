@@ -70,7 +70,21 @@ function executeItems(keys, items, callback){
               } else {
                 console.log("Data in queue removed successfully.");
               }
-              executeItems(keys, items, callback);
+              if (currentItem.object.hasOwnProperty("effect") && currentItem.object.hasOwnProperty("level")){
+                var effect = {};
+                effect[currentItem.object.effect] = currentItem.object.level * currentItem.object.amountOfEffectByLevel + currentItem.object.amountOfEffectLevel0;
+                console.log(JSON.stringify(effect));
+                ref.child("users/"+currentItem.username).update(effect, function(error){
+                  if (error) {
+                    console.log("Effect not added to user : " + error);
+                  } else {
+                    console.log("Effect successfully added");
+                  }
+                  executeItems(keys, items, callback);
+                });
+              }else{
+                executeItems(keys, items, callback);
+              }
             }
           );
         }
