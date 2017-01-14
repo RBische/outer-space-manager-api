@@ -53,7 +53,6 @@ var building = {
     }
   },
   createBuildingForUser: function(req, res){
-    //TODO: verify already building
     if (req.user!=undefined || req.user.username!=undefined || req.params.buildingId!=undefined){
       var user = req.user;
       var buildingsRef = ref.child("users/"+user.username+"/buildings/"+req.params.buildingId);
