@@ -27,9 +27,9 @@ var building = {
     });
   },
   getBuildingsForUser: function(req, res) {
-    if (req.params.username!=undefined){
-      console.log("Current username:"+req.params.username);
-      var buildingsRef = ref.child("users/"+req.params.username+"/buildings");
+    if (req.user.username!=undefined){
+      console.log("Current username:"+req.user.username);
+      var buildingsRef = ref.child("users/"+req.user.username+"/buildings");
       buildingsRef.once("value", function(snapshot) {
         console.log("Successfully fetched buildings for user");
         var buildingFetched = snapshot.val();

@@ -12,6 +12,7 @@ var ref = db.ref("outer-space-manager");
 var auth = require('./api/authRest.js');
 var userRest = require('./api/userRest.js');
 var buildings = require('./api/buildingRest.js');
+var searches = require('./api/searchRest.js');
 var app = exports.app = express();
 
 app.set('port', (process.env.PORT || 6000));
@@ -89,8 +90,11 @@ router.use(function(req, res, next) {
   }
 });
 router.get('/api/v1/buildings', buildings.getBuildings);
-router.get('/api/v1/buildings/list/:username', buildings.getBuildingsForUser);
+router.get('/api/v1/buildings/list', buildings.getBuildingsForUser);
 router.post('/api/v1/buildings/create/:buildingId', buildings.createBuildingForUser);
+router.get('/api/v1/searches', searches.getSearches);
+router.get('/api/v1/searches/list', searches.getSearchesForUser);
+router.post('/api/v1/searches/create/:searchId', searches.createSearchForUser);
 
 app.use('/', router);
 if (module.parent === null) {

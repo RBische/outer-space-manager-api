@@ -15,6 +15,7 @@ require('api-easy')
 .expect('Start server', function () {
   require('../api/authRest').deleteUser("alan");
   require('../api/authRest').deleteUser("alanee");
+  require('../api/authRest').deleteUser("alansearch");
   require('../db/queueHelper').clearQueue();
   app.app.listen(PORT);
 }).next()
@@ -25,6 +26,13 @@ require('api-easy')
 
 // 1. Test with dummy user
 .post('/auth/create', {"username":"alan","password":"testpassword"})
+.expect('Should correctly create the user', function (err, res, body) {
+  var result = JSON.parse(body);
+  console.log(result);
+})
+.expect(200)
+.next()
+.post('/auth/create', {"username":"alansearch","password":"testpassword"})
 .expect('Should correctly create the user', function (err, res, body) {
   var result = JSON.parse(body);
   console.log(result);

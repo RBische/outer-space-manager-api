@@ -1,12 +1,12 @@
 require('dotenv').config({verbose: true});
-const PORT = 3001;
+const PORT = 3002;
 var assert = require('assert')
   , app = require('../index')
   , expected_id = 1;
-var token = require('../api/authRest').pushToken("alan");
+var token = require('../api/authRest').pushToken("alansearch");
 // Configure REST API host & URL
 require('api-easy')
-.describe('building-rest')
+.describe('search-rest')
 .use('localhost', PORT)
 .root('/api/v1')
 .setHeader('Content-Type', 'application/json')
@@ -16,37 +16,37 @@ require('api-easy')
 .expect('Start server', function () {
   app.app.listen(PORT);
 }).next()
-.expect('Creating building', function () {
-  require('../api/buildingRest').addBuilding("alan", 0);
+.expect('Creating first level research', function () {
+  require('../api/searchRest').addSearch("alansearch", 0);
 }).next()
 .setHeader('x-access-token', token.token)
-// 1. Get list of buildings
-.get('/buildings')
+// 1. Get list of searches
+.get('/searches')
 .expect(200)
-.expect('Should have more than zero buildings', function (err, res, body) {
+.expect('Should have more than zero searches', function (err, res, body) {
   var result = JSON.parse(body);
-  assert.ok(result.buildings.length > 0, 'The list does not contains buildings');
+  assert.ok(result.searches.length > 0, 'The list does not contains searches');
 })
 .next()
 // 2. Get list for the alan
-.get('/buildings/list')
+.get('/searches/list')
 .expect(200)
-.expect('Should have more than zero buildings', function (err, res, body) {
+.expect('Should have more than zero searches', function (err, res, body) {
   var result = JSON.parse(body);
-  assert.ok(result.buildings.length > 0, 'The list does not contains buildings');
+  assert.ok(result.searches.length > 0, 'The list does not contains searches');
 })
 .next()
-// 3. Builds a build for a specific user
-.post('/buildings/create/0',{})
+// 3. Builds a search for a specific user
+.post('/searches/create/0',{})
 .expect(401)
 .next()
 .expect('Giving resources', function () {
-  require('../api/userRest').changeResources("alan", 300, 300);
+  require('../api/userRest').changeResources("alansearch", 300, 300);
 }).next()
-.post('/buildings/create/0',{})
+.post('/searches/create/0',{})
 .expect(200)
 .next()
-.post('/buildings/create/0',{})
+.post('/searches/create/0',{})
 .expect(401)
 .expect('Should have not_enough_resources code', function (err, res, body) {
   var result = JSON.parse(body);
@@ -55,9 +55,9 @@ require('api-easy')
 })
 .next()
 .expect('Giving resources', function () {
-  require('../api/userRest').changeResources("alan", 300, 300);
+  require('../api/userRest').changeResources("alansearch", 300, 300);
 }).next()
-.post('/buildings/create/0',{})
+.post('/searches/create/0',{})
 .expect(401)
 .expect('Should have already_in_queue code', function (err, res, body) {
   var result = JSON.parse(body);

@@ -60,6 +60,36 @@ var seed = {
       }
     }
     );
+    var refSearches = db.ref("outer-space-manager").child("searches");
+    refSearches.remove();
+    refSearches.update(
+    {
+      0:{
+        "name": "Centrale électrique",
+        "effect":"speed_building",
+        "amountOfEffectByLevel":30,
+        "amountOfEffectLevel0":0,
+        "timeToBuildByLevel":200,
+        "timeToBuildLevel0":60,
+        "mineralCostByLevel":200,
+        "mineralCostLevel0":100,
+        "gasCostByLevel":200,
+        "gasCostLevel0":100
+      },
+      1:{
+        "name": "Spatioport",
+        "effect":"speed_fleet",
+        "amountOfEffectByLevel":100,
+        "amountOfEffectLevel0":100,
+        "timeToBuildByLevel":200,
+        "timeToBuildLevel0":60,
+        "mineralCostByLevel":200,
+        "mineralCostLevel0":100,
+        "gasCostByLevel":200,
+        "gasCostLevel0":100
+      }
+    }
+    );
   }
 }
 
