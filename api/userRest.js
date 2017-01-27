@@ -21,8 +21,8 @@ var user = {
   },
   refreshResources: function (user, callback) {
     var dateAfter = Date.now()
-    var mineralsAfter = user.minerals + globalConfig.mineralsGenerated * user.mineralsModifier * ((dateAfter - user.lastResourcesRefresh) / 1000)
-    var gasAfter = user.gas + globalConfig.gasGenerated * user.gasModifier * ((dateAfter - user.lastResourcesRefresh) / 1000)
+    var mineralsAfter = user.minerals + globalConfig.generateMinerals(((dateAfter - user.lastResourcesRefresh) / 1000), user.mineralsModifier)
+    var gasAfter = user.gas + globalConfig.generateGas(((dateAfter - user.lastResourcesRefresh) / 1000), user.gasModifier)
     user.minerals = mineralsAfter
     user.gas = gasAfter
     user.lastResourcesRefresh = dateAfter
