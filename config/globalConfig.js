@@ -20,4 +20,13 @@ globalConfig.calculateExecutionTimeForBuilding = function (speedBuilding, level,
   return executionTime
 }
 
+globalConfig.calculateExecutionTimeForSearch = function (speedSearch, level, timeToSearchLevel0, timeToSearchByLevel, searchId) {
+  var executionTime = (timeToSearchByLevel * level + timeToSearchLevel0) * 1000 + Date.now()
+  if (speedSearch !== undefined) {
+    console.log('Reduced time by ' + speedSearch + ' seconds')
+    executionTime = executionTime - speedSearch * 1000
+  }
+  return executionTime
+}
+
 module.exports = globalConfig
