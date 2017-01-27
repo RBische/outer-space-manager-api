@@ -1,4 +1,5 @@
 var admin = require('../db/db')
+var globalConfig = require('../config/globalConfig')
 var userRest = require('../api/userRest')
 var queueHelper = require('../db/queueHelper')
 // As an admin, the app has access to read and write all data, regardless of Security Rules
@@ -76,11 +77,7 @@ var building = {
               console.log('Current minerals : ' + user.minerals + ' And after : ' + (user.minerals - mineralCost))
               userRest.changeResources(user.username, -mineralCost, -gasCost)
               console.log('Minerals transaction done')
-              var executionTime = (buildingFetched.timeToBuildByLevel * buildingFetched.level + buildingFetched.timeToBuildLevel0) * 1000 + Date.now()
-              if (user['speed_building'] !== undefined) {
-                console.log('Reduced time by ' + user['speed_building'] + ' seconds')
-                executionTime = executionTime - user['speed_building'] * 1000
-              }
+              var executionTime = globalConfig.calculateExecutionTimeForBuilding(user['speed_building'], buildingFetched.level, buildingFetched.timeToBuildLevel0, buildingFetched.timeToBuildByLevel, req.params.buildingId)
               console.log('Building will be ok at : ' + executionTime + ' It is now : ' + Date.now())
               buildingFetched.level = futureLevel
               ref.child('users/' + user.username + '/buildings/' + req.params.buildingId).update({building: true},
