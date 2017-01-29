@@ -61,45 +61,24 @@ var building = {
         var buildingFetched = snapshot.val()
         console.log('Successfully fetched buildings for user')
         if (!buildingFetched) {
-          res.respond('No buildings found', 'no_buildings_found', 404)
-          return
-        }
-        if (buildingFetched) {
-          var futureLevel = buildingFetched.level + 1
-          console.log('Building future level: ' + futureLevel)
-          var mineralCost = buildingFetched.mineralCostByLevel * (futureLevel - 1) + buildingFetched.mineralCostLevel0
-          console.log('Mineral cost ' + buildingFetched.mineralCostByLevel * (futureLevel - 1))
-          var gasCost = buildingFetched.gasCostByLevel * buildingFetched.level + buildingFetched.gasCostLevel0
-          if (userRest.hasSufficientResources(user.minerals, user.gas, mineralCost, gasCost)) {
-            console.log('Is building : ' + buildingFetched.building)
-            if (!buildingFetched.building) {
-              console.log('Using minerals ' + user.minerals)
-              console.log('Current minerals : ' + user.minerals + ' And after : ' + (user.minerals - mineralCost))
-              userRest.changeResources(user.username, -mineralCost, -gasCost)
-              console.log('Minerals transaction done')
-              var executionTime = globalConfig.calculateExecutionTimeForBuilding(user['speed_building'], buildingFetched.level, buildingFetched.timeToBuildLevel0, buildingFetched.timeToBuildByLevel, req.params.buildingId)
-              console.log('Building will be ok at : ' + executionTime + ' It is now : ' + Date.now())
-              buildingFetched.level = futureLevel
-              ref.child('users/' + user.username + '/buildings/' + req.params.buildingId).update({building: true},
-                function () {
-                  buildingFetched.building = false
-                  queueHelper.addToQueue('buildings', buildingFetched, 'users/' + user.username + '/buildings/' + req.params.buildingId, executionTime, user.username,
-                    function () {
-                      res.json({code: 'ok'})
-                    }
-                  )
-                }
-              )
+          var buildingsRef = ref.child('/buildings/' + req.params.buildingId)
+          buildingsRef.once('value', function (snapshot) {
+            var buildingFetched = snapshot.val()
+            if (buildingFetched) {
+              console.log('Successfully fetched building')
+              constructBuilding(req, res, user, buildingFetched)
             } else {
-              res.respond('Building already in queue', 'already_in_queue', 401)
-              return
+              res.respond('No buildings found', 'no_buildings_found', 404)
             }
-          } else {
-            res.respond('Not enough resources', 'not_enough_resources', 401)
-            return
-          }
+          }, function (errorObject) {
+            res.respond('Error in server side', 'internal_error', 500)
+            console.log('Error fetching building : ' + errorObject)
+          })
+        } else {
+          constructBuilding(req, res, user, buildingFetched)
         }
       }, function (errorObject) {
+        res.respond('Error in server side', 'internal_error', 500)
         console.log('Error fetching buildings for user : ' + errorObject)
       })
     } else {
@@ -128,6 +107,45 @@ var building = {
     }, function (errorObject) {
       console.log('Error fetching building : ' + errorObject)
     })
+  }
+}
+
+function constructBuilding (req, res, user, buildingFetched) {
+  var futureLevel = 1
+  if (buildingFetched.level) {
+    futureLevel = futureLevel + buildingFetched.level
+  }
+  console.log('Building future level: ' + futureLevel)
+  var mineralCost = buildingFetched.mineralCostByLevel * (futureLevel - 1) + buildingFetched.mineralCostLevel0
+  console.log('Mineral cost ' + mineralCost)
+  var gasCost = buildingFetched.gasCostByLevel * (futureLevel - 1) + buildingFetched.gasCostLevel0
+  if (userRest.hasSufficientResources(user.minerals, user.gas, mineralCost, gasCost)) {
+    console.log('Is building : ' + buildingFetched.building)
+    if (!buildingFetched.building) {
+      console.log('Using minerals ' + user.minerals)
+      console.log('Current minerals : ' + user.minerals + ' And after : ' + (user.minerals - mineralCost))
+      userRest.changeResources(user.username, -mineralCost, -gasCost)
+      console.log('Minerals transaction done')
+      var executionTime = globalConfig.calculateExecutionTimeForBuilding(user['speed_building'], futureLevel - 1, buildingFetched.timeToBuildLevel0, buildingFetched.timeToBuildByLevel, req.params.buildingId)
+      console.log('Building will be ok at : ' + executionTime + ' It is now : ' + Date.now())
+      buildingFetched.level = futureLevel
+      ref.child('users/' + user.username + '/buildings/' + req.params.buildingId).update({building: true},
+        function () {
+          buildingFetched.building = false
+          queueHelper.addToQueue('buildings', buildingFetched, 'users/' + user.username + '/buildings/' + req.params.buildingId, executionTime, user.username,
+            function () {
+              res.json({code: 'ok'})
+            }
+          )
+        }
+      )
+    } else {
+      res.respond('Building already in queue', 'already_in_queue', 401)
+      return
+    }
+  } else {
+    res.respond('Not enough resources', 'not_enough_resources', 401)
+    return
   }
 }
 
