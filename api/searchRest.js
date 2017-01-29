@@ -61,47 +61,23 @@ var search = {
       searchesRef.once('value', function (snapshot) {
         var searchFetched = snapshot.val()
         console.log('Successfully fetched searches for user')
-        if (!searchFetched) {
-          res.respond('No searches found', 'no_searches_found', 404)
-          return
-        }
         if (searchFetched) {
-          var futureLevel = searchFetched.level + 1
-          console.log('Search future level: ' + futureLevel)
-          var mineralCost = searchFetched.mineralCostByLevel * (futureLevel - 1) + searchFetched.mineralCostLevel0
-          console.log('Mineral cost ' + searchFetched.mineralCostByLevel * (futureLevel - 1) + ' - current resources ' + user.minerals)
-          var gasCost = searchFetched.gasCostByLevel * searchFetched.level + searchFetched.gasCostLevel0
-          if (userRest.hasSufficientResources(user.minerals, user.gas, mineralCost, gasCost)) {
-            console.log('Is building : ' + searchFetched.building)
-            if (!searchFetched.building) {
-              console.log('Using minerals ' + user.minerals)
-              console.log('Current minerals : ' + user.minerals + ' And after : ' + (user.minerals - mineralCost))
-              userRest.changeResources(user.username, -mineralCost, -gasCost)
-              console.log('Minerals transaction done')
-              var executionTime = globalConfig.calculateExecutionTimeForSearch(user['speed_search'], searchFetched.level, searchFetched.timeToBuildLevel0, searchFetched.timeToBuildByLevel, req.params.searchId)
-              console.log('Search will be ok at : ' + executionTime + ' It is now : ' + Date.now())
-              searchFetched.level = futureLevel
-              ref.child('users/' + user.username + '/searches/' + req.params.searchId).update({building: true},
-                function () {
-                  searchFetched.building = false
-                  queueHelper.addToQueue('searches', searchFetched, 'users/' + user.username + '/searches/' + req.params.searchId, executionTime, user.username,
-                    function () {
-                      res.json({code: 'ok'})
-                    }
-                  )
-                }
-              )
-            } else {
-              res.respond('Search already in queue', 'already_in_queue', 401)
-              return
-            }
-          } else {
-            res.respond('Not enough resources', 'not_enough_resources', 401)
-            return
-          }
+          addSearchToQueue(req, res, user, searchFetched)
         } else {
-          res.respond('Not searches found', 'no_searches_found', 404)
-          return
+          console.log('Searching search :' + '/searches/' + req.params.searchId)
+          var searchesRef = ref.child('/searches/' + req.params.searchId)
+          searchesRef.once('value', function (snapshot) {
+            var searchFetched = snapshot.val()
+            if (searchFetched) {
+              console.log('Successfully fetched search')
+              addSearchToQueue(req, res, user, searchFetched)
+            } else {
+              res.respond('Not searches found', 'no_searches_found', 404)
+            }
+          }, function (errorObject) {
+            res.respond('Error in server side', 'internal_error', 500)
+            console.log('Error fetching building : ' + errorObject)
+          })
         }
       }, function (errorObject) {
         console.log('Error fetching searches for user : ' + errorObject)
@@ -132,6 +108,45 @@ var search = {
     }, function (errorObject) {
       console.log('Error fetching search : ' + errorObject)
     })
+  }
+}
+
+function addSearchToQueue (req, res, user, searchFetched) {
+  var futureLevel = 1
+  if (searchFetched.level) {
+    futureLevel = futureLevel + searchFetched.level
+  }
+  console.log('Search future level: ' + futureLevel)
+  var mineralCost = searchFetched.mineralCostByLevel * (futureLevel - 1) + searchFetched.mineralCostLevel0
+  console.log('Mineral cost ' + searchFetched.mineralCostByLevel * (futureLevel - 1) + ' - current resources ' + user.minerals)
+  var gasCost = searchFetched.gasCostByLevel * (futureLevel - 1) + searchFetched.gasCostLevel0
+  if (userRest.hasSufficientResources(user.minerals, user.gas, mineralCost, gasCost)) {
+    console.log('Is building : ' + searchFetched.building)
+    if (!searchFetched.building) {
+      console.log('Using minerals ' + user.minerals)
+      console.log('Current minerals : ' + user.minerals + ' And after : ' + (user.minerals - mineralCost))
+      userRest.changeResources(user.username, -mineralCost, -gasCost)
+      console.log('Minerals transaction done')
+      var executionTime = globalConfig.calculateExecutionTimeForSearch(user['speed_search'], (futureLevel - 1), searchFetched.timeToBuildLevel0, searchFetched.timeToBuildByLevel, req.params.searchId)
+      console.log('Search will be ok at : ' + executionTime + ' It is now : ' + Date.now())
+      searchFetched.level = futureLevel
+      ref.child('users/' + user.username + '/searches/' + req.params.searchId).update({building: true},
+        function () {
+          searchFetched.building = false
+          queueHelper.addToQueue('searches', searchFetched, 'users/' + user.username + '/searches/' + req.params.searchId, executionTime, user.username,
+            function () {
+              res.json({code: 'ok'})
+            }
+          )
+        }
+      )
+    } else {
+      res.respond('Search already in queue', 'already_in_queue', 401)
+      return
+    }
+  } else {
+    res.respond('Not enough resources', 'not_enough_resources', 401)
+    return
   }
 }
 
