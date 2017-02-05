@@ -127,7 +127,9 @@ function addSearchToQueue (req, res, user, searchFetched) {
       console.log('Current minerals : ' + user.minerals + ' And after : ' + (user.minerals - mineralCost))
       userRest.changeResources(user.username, -mineralCost, -gasCost, true)
       console.log('Minerals transaction done')
-      var executionTime = globalConfig.calculateExecutionTimeForSearch(user['speed_search'], (futureLevel - 1), searchFetched.timeToBuildLevel0, searchFetched.timeToBuildByLevel, req.params.searchId)
+      const speedFromBuildings = user['speed_search'] ? user['speed_search'] : 0
+      const speedFromSearch = user['speed_search_from_search'] ? user['speed_search_from_search'] : 0
+      var executionTime = globalConfig.calculateExecutionTimeForSearch(speedFromBuildings + speedFromSearch, (futureLevel - 1), searchFetched.timeToBuildLevel0, searchFetched.timeToBuildByLevel, req.params.searchId)
       console.log('Search will be ok at : ' + executionTime + ' It is now : ' + Date.now())
       searchFetched.level = futureLevel
       ref.child('users/' + user.username + '/searches/' + req.params.searchId).update({building: true},
