@@ -124,7 +124,7 @@ function constructBuilding (req, res, user, buildingFetched) {
     if (!buildingFetched.building) {
       console.log('Using minerals ' + user.minerals)
       console.log('Current minerals : ' + user.minerals + ' And after : ' + (user.minerals - mineralCost))
-      userRest.changeResources(user.username, -mineralCost, -gasCost)
+      userRest.changeResources(user.username, -mineralCost, -gasCost, true)
       console.log('Minerals transaction done')
       var executionTime = globalConfig.calculateExecutionTimeForBuilding(user['speed_building'], futureLevel - 1, buildingFetched.timeToBuildLevel0, buildingFetched.timeToBuildByLevel, req.params.buildingId)
       console.log('Building will be ok at : ' + executionTime + ' It is now : ' + Date.now())

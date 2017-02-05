@@ -29,4 +29,8 @@ globalConfig.calculateExecutionTimeForSearch = function (speedSearch, level, tim
   return executionTime
 }
 
+globalConfig.calculatePointsForUser = function (minerals, gas) {
+  return Math.abs(minerals) + Math.abs(gas) * 1.1
+}
+
 module.exports = globalConfig

@@ -125,7 +125,7 @@ function addSearchToQueue (req, res, user, searchFetched) {
     if (!searchFetched.building) {
       console.log('Using minerals ' + user.minerals)
       console.log('Current minerals : ' + user.minerals + ' And after : ' + (user.minerals - mineralCost))
-      userRest.changeResources(user.username, -mineralCost, -gasCost)
+      userRest.changeResources(user.username, -mineralCost, -gasCost, true)
       console.log('Minerals transaction done')
       var executionTime = globalConfig.calculateExecutionTimeForSearch(user['speed_search'], (futureLevel - 1), searchFetched.timeToBuildLevel0, searchFetched.timeToBuildByLevel, req.params.searchId)
       console.log('Search will be ok at : ' + executionTime + ' It is now : ' + Date.now())
