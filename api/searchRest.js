@@ -126,6 +126,7 @@ function addSearchToQueue (req, res, user, searchFetched) {
       console.log('Using minerals ' + user.minerals)
       console.log('Current minerals : ' + user.minerals + ' And after : ' + (user.minerals - mineralCost))
       userRest.changeResources(user.username, -mineralCost, -gasCost, true)
+      const points = globalConfig.calculatePointsForUser(mineralCost, gasCost)
       console.log('Minerals transaction done')
       const speedFromBuildings = user['speed_search'] ? user['speed_search'] : 0
       const speedFromSearch = user['speed_search_from_search'] ? user['speed_search_from_search'] : 0
@@ -135,7 +136,7 @@ function addSearchToQueue (req, res, user, searchFetched) {
       ref.child('users/' + user.username + '/searches/' + req.params.searchId).update({building: true},
         function () {
           searchFetched.building = false
-          queueHelper.addToQueue('searches', searchFetched, 'users/' + user.username + '/searches/' + req.params.searchId, executionTime, user.username,
+          queueHelper.addToQueue('searches', searchFetched, 'users/' + user.username + '/searches/' + req.params.searchId, executionTime, points, user.username,
             function () {
               res.json({code: 'ok'})
             }

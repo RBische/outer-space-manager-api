@@ -8,16 +8,12 @@ var user = {
   hasSufficientResources: function (userMineral, userGas, mineral, gas) {
     return userMineral >= mineral && userGas >= gas
   },
-  changeResources: function (username, minerals, gas, mustAddPoints) {
+  changeResources: function (username, minerals, gas) {
     var userRef = ref.child('users/' + username)
     userRef.once('value', function (snapshot) {
       var userFetched = snapshot.val()
       userFetched.minerals = userFetched.minerals + minerals
       userFetched.gas = userFetched.gas + gas
-      if (mustAddPoints) {
-        var points = userFetched.points ? userFetched.points : 0
-        userFetched.points = points + globalConfig.calculatePointsForUser(minerals, gas)
-      }
       ref.child('users/' + username).update(userFetched)
     }, function (errorObject) {
       console.log('Error giving resources')

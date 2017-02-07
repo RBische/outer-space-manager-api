@@ -124,7 +124,8 @@ function constructBuilding (req, res, user, buildingFetched) {
     if (!buildingFetched.building) {
       console.log('Using minerals ' + user.minerals)
       console.log('Current minerals : ' + user.minerals + ' And after : ' + (user.minerals - mineralCost))
-      userRest.changeResources(user.username, -mineralCost, -gasCost, true)
+      userRest.changeResources(user.username, -mineralCost, -gasCost)
+      const points = globalConfig.calculatePointsForUser(mineralCost, gasCost)
       console.log('Minerals transaction done')
       const speedFromBuildings = user['speed_building'] ? user['speed_building'] : 0
       const speedFromSearch = user['speed_building_from_search'] ? user['speed_building_from_search'] : 0
@@ -134,7 +135,7 @@ function constructBuilding (req, res, user, buildingFetched) {
       ref.child('users/' + user.username + '/buildings/' + req.params.buildingId).update({building: true},
         function () {
           buildingFetched.building = false
-          queueHelper.addToQueue('buildings', buildingFetched, 'users/' + user.username + '/buildings/' + req.params.buildingId, executionTime, user.username,
+          queueHelper.addToQueue('buildings', buildingFetched, 'users/' + user.username + '/buildings/' + req.params.buildingId, executionTime, points, user.username,
             function () {
               res.json({code: 'ok'})
             }

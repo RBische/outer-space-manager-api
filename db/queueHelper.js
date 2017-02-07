@@ -4,14 +4,15 @@ var queueRef = db.ref('outer-space-manager/queue')
 var ref = db.ref('outer-space-manager')
 
 var queue = {
-  addToQueue: function (objectType, object, key, executionTime, username, callback) {
+  addToQueue: function (objectType, object, key, executionTime, points, username, callback) {
     queueRef.child((executionTime)).update(
       {
         objectType: objectType,
         object: object,
         key: key,
         executionTime: executionTime,
-        username: username
+        username: username,
+        points: points
       }, function (error) {
       if (error) {
         console.log('Data in queue could not be saved.' + error)
@@ -69,24 +70,19 @@ function executeItems (keys, items, callback) {
               } else {
                 console.log('Data in queue removed successfully.')
               }
-              if (currentItem.object.hasOwnProperty('effect') && currentItem.object.hasOwnProperty('level')) {
-                var effect = {}
-                effect[currentItem.object.effect] = currentItem.object.level * currentItem.object.amountOfEffectByLevel + currentItem.object.amountOfEffectLevel0
-                console.log(JSON.stringify(effect))
-                ref.child('users/' + currentItem.username).update(effect, function (error) {
+              var userRef = ref.child('users/' + currentItem.username)
+              userRef.once('value', function (snapshot) {
+                var userFetched = snapshot.val()
+                userFetched.points = userFetched.points + currentItem.points
+                ref.child('users/' + currentItem.username).update(userFetched, function (error) {
                   if (error) {
-                    console.log('Effect not added to user : ' + error)
+                    console.log('Points not added to user : ' + error)
                   } else {
-                    console.log('Effect successfully added')
+                    console.log('Points successfully added')
                   }
-                  executeItems(keys, items, callback)
-                })
-              } else if (currentItem.object.hasOwnProperty('effect_added') && currentItem.object.hasOwnProperty('level')) {
-                ref.child('users/' + currentItem.username).once('value', function (snapshot) {
-                  const userToModify = snapshot.val()
-                  if (userToModify) {
+                  if (currentItem.object.hasOwnProperty('effect') && currentItem.object.hasOwnProperty('level')) {
                     var effect = {}
-                    effect[currentItem.object.effect_added] = userToModify[currentItem.object.effect_added] + currentItem.object.amountOfEffectByLevel
+                    effect[currentItem.object.effect] = currentItem.object.level * currentItem.object.amountOfEffectByLevel + currentItem.object.amountOfEffectLevel0
                     console.log(JSON.stringify(effect))
                     ref.child('users/' + currentItem.username).update(effect, function (error) {
                       if (error) {
@@ -96,13 +92,32 @@ function executeItems (keys, items, callback) {
                       }
                       executeItems(keys, items, callback)
                     })
+                  } else if (currentItem.object.hasOwnProperty('effect_added') && currentItem.object.hasOwnProperty('level')) {
+                    ref.child('users/' + currentItem.username).once('value', function (snapshot) {
+                      const userToModify = snapshot.val()
+                      if (userToModify) {
+                        var effect = {}
+                        effect[currentItem.object.effect_added] = userToModify[currentItem.object.effect_added] + currentItem.object.amountOfEffectByLevel
+                        console.log(JSON.stringify(effect))
+                        ref.child('users/' + currentItem.username).update(effect, function (error) {
+                          if (error) {
+                            console.log('Effect not added to user : ' + error)
+                          } else {
+                            console.log('Effect successfully added')
+                          }
+                          executeItems(keys, items, callback)
+                        })
+                      } else {
+                        executeItems(keys, items, callback())
+                      }
+                    })
                   } else {
-                    executeItems(keys, items, callback())
+                    executeItems(keys, items, callback)
                   }
                 })
-              } else {
-                executeItems(keys, items, callback)
-              }
+              }, function (errorObject) {
+                console.log('Error giving resources')
+              })
             }
           )
         }
