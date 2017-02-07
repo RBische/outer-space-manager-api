@@ -11,6 +11,7 @@ var db = admin.database()
 var ref = db.ref('outer-space-manager')
 
 var auth = require('./api/authRest.js')
+var fleetRest = require('./api/fleetRest.js')
 var userRest = require('./api/userRest.js')
 var buildings = require('./api/buildingRest.js')
 var searches = require('./api/searchRest.js')
@@ -91,6 +92,8 @@ router.post('/api/v1/buildings/create/:buildingId', buildings.createBuildingForU
 router.get('/api/v1/searches', searches.getSearches)
 router.get('/api/v1/searches/list', searches.getSearchesForUser)
 router.post('/api/v1/searches/create/:searchId', searches.createSearchForUser)
+router.get('/api/v1/ships', fleetRest.getShips)
+router.get('/api/v1/fleet/list', fleetRest.getShipsForUser)
 
 app.use('/', router)
 if (module.parent === null) {

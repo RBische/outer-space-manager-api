@@ -46,29 +46,33 @@ var seed = {
         }
       }
     )
-    var refVessels = db.ref('outer-space-manager').child('vessels')
-    refVessels.remove()
-    refVessels.update(
+    var refShips = db.ref('outer-space-manager').child('ships')
+    refShips.remove()
+    refShips.update(
       {
         0: {
-          'name': 'Centrale électrique',
-          'effect': 'speed_building',
-          'amountOfEffectByLevel': 100,
-          'amountOfEffectLevel0': 100,
-          'timeToBuildByLevel': 200,
-          'timeToBuildLevel0': 60,
-          'costByLevel': 200,
-          'costLevel0': 100
+          'name': 'Chasseur léger',
+          'spatioportLevelNeeded': 0,
+          'timeToBuild': 30,
+          'mineralCost': 300,
+          'gasCost': 100,
+          'minAttack': 40,
+          'maxAttack': 60,
+          'life': 60,
+          'shield': 15,
+          'speed': 1000
         },
         1: {
-          'name': 'Spatioport',
-          'effect': 'speed_fleet',
-          'amountOfEffectByLevel': 100,
-          'amountOfEffectLevel0': 100,
-          'timeToBuildByLevel': 200,
-          'timeToBuildLevel0': 60,
-          'costByLevel': 200,
-          'costLevel0': 100
+          'name': 'Chasseur lourd',
+          'spatioportLevelNeeded': 2,
+          'timeToBuild': 60,
+          'mineralCost': 600,
+          'gasCost': 250,
+          'minAttack': 90,
+          'maxAttack': 110,
+          'life': 120,
+          'shield': 50,
+          'speed': 850
         }
       }
     )
