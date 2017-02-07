@@ -101,3 +101,5 @@ if (module.parent === null) {
     console.log('Node app is running on port', app.get('port'))
   })
 }
+// Used to expose the app for the tests
+module.exports = app

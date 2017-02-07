@@ -1,7 +1,8 @@
+var admin = require('../db/db')
 var seed = {
   fillDb: function () {
     console.log('Filling db')
-    var admin = require('../db/db')
+
     // As an admin, the app has access to read and write all data, regardless of Security Rules
     var db = admin.database()
     var refBuildings = db.ref('outer-space-manager').child('buildings')

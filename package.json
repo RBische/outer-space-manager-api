@@ -5,14 +5,16 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "test": "standard && vows test/*-test.js --spec"
+    "test": "standard && vows test/vows/*-test.js --spec && tape ./test/tape/**/**-test.js"
   },
   "devDependencies": {
     "api-easy": "0.2.x",
     "async": "0.1.x",
     "dotenv": "2.0.0",
     "standard": "^8.6.0",
-    "vows": "0.5.x"
+    "vows": "0.5.x",
+    "supertest": "^2.0.1",
+    "tape": "^4.6.3"
   },
   "repository": {
     "type": "git",
