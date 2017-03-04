@@ -6,20 +6,25 @@ var ref = db.ref('outer-space-manager')
 
 var auth = {
   /**
-   * @api {post} /vXXX/features/label/modify Modify a label
-   * @apiDescription Adds a label to threads for a specific user in Gmail mailbox
-   * @apiName AddLabel
-   * @apiGroup Label
+   * @api {post} /api/vXXX/auth/create Creates an user
+   * @apiDescription Used to create a new instance of an user
+   * @apiName CreateUser
+   * @apiGroup User
+   * @apiVersion 1.0.0
    *
-   * @apiParam {Object} posted
-   * @apiParam {String} posted.threadId The message where labels will be added
-   * @apiParam {String[]} posted.labelIds Labels that will be added to the conversation
-   * @apiPermission AuthenticatedUser
+   * @apiParam {String} username The username of the player
+   * @apiParam {String} password The password of the player
    *
-   * @apiSuccess {Integer} result_code 200.
-   * @apiSuccess {String} status_code LabelAdded
-   * @apiError NoAccessRight Only authenticated users can access the data. (403)
-   * @apiError InvalidParameters No thread or message corresponding to the given threadId found or no label specified. (400)
+   * @apiSuccessExample {json} Success
+   *     HTTP/1.1 200 OK
+   *     {
+   *       username: "theUserNameSupplied",
+   *       token: "atoken",
+   *       expires: "expirationInMilliseconds"
+   *     }
+   * @apiError invalid_request Missing username or password (401)
+   * @apiError invalid_credentials Must not happen but the create uses the login flow (401)
+   * @apiError already_registered_username Already registered username (400)
    */
   create: function (req, res) {
     var username = req.body.username || ''
@@ -66,7 +71,7 @@ var auth = {
             lastResourcesRefresh: Date.now()
           }
         )
-        res.json({code: 'ok'})
+        auth.login(req, res)
       }
     }, function (errorObject) {
       console.log('Error fetching user : ' + errorObject)
@@ -78,6 +83,26 @@ var auth = {
     usersRef.remove()
   },
 
+  /**
+   * @api {post} /api/vXXX/auth/login Sign an user in
+   * @apiDescription Used to sign in
+   * @apiName LoginUser
+   * @apiGroup User
+   * @apiVersion 1.0.0
+   *
+   * @apiParam {String} username The username of the player
+   * @apiParam {String} password The password of the player
+   *
+   * @apiSuccessExample {json} Success
+   *     HTTP/1.1 200 OK
+   *     {
+   *       username: "theUserNameSupplied",
+   *       token: "atoken",
+   *       expires: "expirationInMilliseconds"
+   *     }
+   * @apiError invalid_request Missing username or password (401)
+   * @apiError invalid_credentials The password or the username are wrong (401)
+   */
   login: function (req, res) {
     var username = req.body.username || ''
     var password = req.body.password || ''
