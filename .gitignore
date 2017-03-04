@@ -30,6 +30,8 @@ build/Release
 # Dependency directories
 node_modules
 jspm_packages
+doc/*
+!doc/.gitkeep 
 
 # Optional npm cache directory
 .npm

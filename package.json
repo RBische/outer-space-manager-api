@@ -4,10 +4,11 @@
   "description": "Api for the project Outer space manager",
   "main": "index.js",
   "scripts": {
+    "postinstall": "node ./node_modules/apidoc/bin/apidoc -i ./api/ -o ./doc/",
     "start": "node index.js",
     "test": "standard && ./node_modules/vows/bin/vows test/vows/*-test.js --spec && ./node_modules/tape/bin/tape ./test/tape/**/**-test.js",
     "coverage": "node ./node_modules/istanbul/lib/cli.js cover -dir 'coveragevows' ./node_modules/vows/bin/vows test/vows/*-test.js --spec && node ./node_modules/istanbul/lib/cli.js cover ./node_modules/tape/bin/tape ./test/tape/**/**-test.js",
-    "mergecoverage":"npm run-script coverage && node ./node_modules/istanbul-combine/cli.js -d coverage -r lcov ./coverage/*.json ./coveragevows/*.json",
+    "mergecoverage": "npm run-script coverage && node ./node_modules/istanbul-combine/cli.js -d coverage -r lcov ./coverage/*.json ./coveragevows/*.json",
     "coveralls": "npm run-script mergecoverage && node ./node_modules/coveralls/bin/coveralls.js < coverage/lcov.info"
   },
   "devDependencies": {
@@ -42,6 +43,7 @@
   },
   "homepage": "https://github.com/RBische/outer-space-manager-api#readme",
   "dependencies": {
+    "apidoc": "^0.17.5",
     "body-parser": "^1.15.2",
     "firebase-admin": "^4.0.4",
     "jsonwebtoken": "^7.2.1"

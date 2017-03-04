@@ -5,6 +5,22 @@ var db = admin.database()
 var ref = db.ref('outer-space-manager')
 
 var auth = {
+  /**
+   * @api {post} /vXXX/features/label/modify Modify a label
+   * @apiDescription Adds a label to threads for a specific user in Gmail mailbox
+   * @apiName AddLabel
+   * @apiGroup Label
+   *
+   * @apiParam {Object} posted
+   * @apiParam {String} posted.threadId The message where labels will be added
+   * @apiParam {String[]} posted.labelIds Labels that will be added to the conversation
+   * @apiPermission AuthenticatedUser
+   *
+   * @apiSuccess {Integer} result_code 200.
+   * @apiSuccess {String} status_code LabelAdded
+   * @apiError NoAccessRight Only authenticated users can access the data. (403)
+   * @apiError InvalidParameters No thread or message corresponding to the given threadId found or no label specified. (400)
+   */
   create: function (req, res) {
     var username = req.body.username || ''
     var password = req.body.password || ''

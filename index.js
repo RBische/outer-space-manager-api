@@ -21,7 +21,7 @@ app.set('port', (process.env.PORT || 6000))
 var bodyParser = require('body-parser')
 app.use(bodyParser.json())
 
-app.use(express.static(path.join(__dirname, '/public')))
+app.use(express.static(path.join(__dirname, '/doc')))
 
 // views is directory for all template files
 app.set('views', path.join(__dirname, '/views'))
