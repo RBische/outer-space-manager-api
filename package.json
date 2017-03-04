@@ -5,16 +5,22 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "test": "standard && ./node_modules/vows/bin/vows test/vows/*-test.js --spec && ./node_modules/tape/bin/tape ./test/tape/**/**-test.js"
+    "test": "standard && ./node_modules/vows/bin/vows test/vows/*-test.js --spec && ./node_modules/tape/bin/tape ./test/tape/**/**-test.js",
+    "coverage": "node ./node_modules/istanbul/lib/cli.js cover -dir 'coveragevows' ./node_modules/vows/bin/vows test/vows/*-test.js --spec && node ./node_modules/istanbul/lib/cli.js cover ./node_modules/tape/bin/tape ./test/tape/**/**-test.js",
+    "mergecoverage":"npm run-script coverage && node ./node_modules/istanbul-combine/cli.js -d coverage -r lcov ./coverage/*.json ./coveragevows/*.json",
+    "coveralls": "npm run-script mergecoverage && node ./node_modules/coveralls/bin/coveralls.js < coverage/lcov.info"
   },
   "devDependencies": {
     "api-easy": "0.2.x",
     "async": "0.1.x",
+    "coveralls": "^2.11.16",
     "dotenv": "2.0.0",
+    "istanbul": "^0.4.5",
+    "istanbul-combine": "^0.3.0",
     "standard": "^8.6.0",
-    "vows": "0.5.x",
     "supertest": "^2.0.1",
-    "tape": "^4.6.3"
+    "tape": "^4.6.3",
+    "vows": "0.5.x"
   },
   "repository": {
     "type": "git",

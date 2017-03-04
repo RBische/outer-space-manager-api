@@ -20,3 +20,14 @@ test('GET /api/v1/ships', function (assert) {
     assert.end()
   })
 })
+
+test('GET /', function (assert) {
+  request(app)
+  .get('/')
+  .expect(200)
+  .end(function (err, res) {
+    console.log(JSON.stringify(err))
+    assert.true(err === null)
+    assert.end()
+  })
+})

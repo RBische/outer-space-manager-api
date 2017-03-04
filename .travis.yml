@@ -3,3 +3,5 @@ language: node_js
 # test on version 6.1
 node_js:
   - 6.1
+script: "npm test"
+after_script: "npm run coveralls"
