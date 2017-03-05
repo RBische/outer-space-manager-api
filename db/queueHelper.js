@@ -159,8 +159,10 @@ function executeItems (keys, items, callback) {
           }
         )
       }
-      if (currentItem.objectType === 'ships' || currentItem.objectType === 'attack') {
+      if (currentItem.objectType === 'ships') {
         afterModifying()
+      } else if (currentItem.objectType === 'attack') {
+        handleAttack(currentItem, keys, items, callback)
       } else {
         ref.child(currentItem.key).update(
           currentItem.object, function (error) {
@@ -179,6 +181,162 @@ function executeItems (keys, items, callback) {
   } else {
     callback()
   }
+}
+function handleAttack (currentItem, keys, items, callback) {
+  queueRef.child('' + currentItem.executionTime).remove(
+    function (error) {
+      if (error) {
+        console.log('Data in queue could not be remove.' + error)
+      } else {
+        console.log('Data in queue removed successfully.')
+      }
+      // TODO: Update the user before the battle begins
+      const messageObject = currentItem.object
+      ref.child('users/' + messageObject.toUser)
+        .once('value')
+        .then(function (attackedUser) {
+          return ref.child('users/' + messageObject.fromUser)
+            .once('value')
+            .then(function (attacker) {
+              return ref.child('ships')
+                .once('value')
+                .then(function (ships) {
+                  return {attacker: attacker.val(), attackedUser: attackedUser.val(), ships: ships.val()}
+                })
+            })
+        })
+        .then(function (res) {
+          const defenderFleet = []
+          for (var key in res.attackedUser.fleet) {
+            if (res.attackedUser.fleet.hasOwnProperty(key)) {
+              defenderFleet.push(res.attackedUser.fleet[key])
+            }
+          }
+          const attackPointsAttacker = calculateAttackPoints(messageObject.fleet, res.ships)
+          const attackPointsDefender = calculateAttackPoints(defenderFleet, res.ships)
+          const shieldPointsAttacker = calculateShieldPoints(messageObject.fleet, res.ships)
+          const shieldPointsDefender = calculateShieldPoints(defenderFleet, res.ships)
+          const damageThroughAttacker = Math.max(attackPointsDefender - shieldPointsAttacker, 0)
+          const damageThroughDefender = Math.max(attackPointsAttacker - shieldPointsDefender, 0)
+          const attackerFleetAfterBattle = getFleetAfterFight(damageThroughAttacker, messageObject.fleet, res.ships)
+          const defenderFleetAfterBattle = getFleetAfterFight(damageThroughDefender, defenderFleet, res.ships)
+          var mineralsWon = 0
+          var gasWon = 0
+          console.log('Updating fleet toUser' + JSON.stringify(defenderFleetAfterBattle.fleet))
+          return ref.child('users/' + messageObject.toUser + '/fleet').update(defenderFleetAfterBattle.fleet)
+            .then(function (fbRes) {
+              const promises = []
+              for (var key in attackerFleetAfterBattle.fleet) {
+                if (attackerFleetAfterBattle.fleet.hasOwnProperty(key)) {
+                  var attackerTotalShipsAfterBattle = attackerFleetAfterBattle.fleet[key].amount
+                  console.log('Amount of this ship in flight ' + attackerFleetAfterBattle.fleet[key].amount)
+                  if (res.attacker.fleet !== undefined && res.attacker.fleet.hasOwnProperty(key)) {
+                    attackerTotalShipsAfterBattle += res.attacker.fleet[key].amount
+                    console.log('Amount of this ship in user ' + res.attacker.fleet[key].amount)
+                  }
+                  console.log('Updating ship fromUser ' + JSON.stringify({amount: attackerTotalShipsAfterBattle}) + ' with node : ' + 'users/' + messageObject.fromUser + '/fleet/' + key)
+                  const promise = ref.child('users/' + messageObject.fromUser + '/fleet/' + key).update({amount: attackerTotalShipsAfterBattle})
+                  promises.push(promise)
+                }
+              }
+              return Promise.all(promises)
+            })
+            .then(function (fbRes) {
+              if (defenderFleetAfterBattle.survivingShips === 0) {
+                const totalCapacity = attackerFleetAfterBattle.capacity
+                const defenderMinerals = res.attackedUser.minerals
+                const defenderGas = res.attackedUser.gas
+                var mineralsAfter = 0
+                var gasAfter = 0
+                if ((defenderGas * 1) / 3 + (defenderMinerals * 1) / 3 > totalCapacity) {
+                  mineralsWon = (totalCapacity * 2) / 3
+                  gasWon = (totalCapacity * 1) / 3
+                } else {
+                  mineralsWon = (defenderMinerals * 1) / 3
+                  gasWon = (defenderGas * 1) / 3
+                }
+                mineralsAfter = defenderMinerals - mineralsWon
+                gasAfter = defenderGas - gasWon
+                console.log('Minerals won : ' + mineralsWon + ' Gas won : ' + gasWon)
+                return ref.child('users/' + messageObject.toUser).update({minerals: mineralsAfter, gas: gasAfter})
+                  .then(function (fbRes) {
+                    return ref.child('users/' + messageObject.fromUser).update({minerals: mineralsWon + res.attacker.minerals, gas: gasAfter + res.attacker.gas})
+                  })
+              }
+            })
+            .then(function (fbRes) {
+              console.log('Creating reports')
+              return ref.child('users/' + messageObject.toUser + '/reports').push({type: 'attacked',
+                date: currentItem.executionTime,
+                defenderFleet: defenderFleet,
+                attackerFleet: messageObject.fleet,
+                defenderFleetAfterBattle: defenderFleetAfterBattle,
+                attackerFleetAfterBattle: attackerFleetAfterBattle,
+                mineralsWon: mineralsWon,
+                gasWon: gasWon
+              })
+              .then(function (res) {
+                return ref.child('users/' + messageObject.fromUser + '/reports').push({type: 'attacker',
+                  date: currentItem.executionTime,
+                  defenderFleet: defenderFleet,
+                  attackerFleet: messageObject.fleet,
+                  defenderFleetAfterBattle: defenderFleetAfterBattle,
+                  attackerFleetAfterBattle: attackerFleetAfterBattle,
+                  mineralsWon: mineralsWon,
+                  gasWon: gasWon
+                })
+              })
+            })
+        })
+        .then(function (res) {
+          executeItems(keys, items, callback)
+        })
+    })
+}
+
+function getFleetAfterFight (damageTaken, fleet, ships) {
+  const shipTypes = Object.keys(fleet).length
+  const damagePerShips = damageTaken / shipTypes
+  const fleetSurviving = {}
+  var totalCapacity = 0
+  var survivingShips = 0
+  for (var i = 0; i < fleet.length; i++) {
+    console.log('Calculating fleet after fight for ship:' + JSON.stringify(fleet[i]))
+    const lifeForShip = ships[fleet[i].shipId].life
+    console.log('Damage per ship:' + damagePerShips)
+    console.log('Life for ship:' + lifeForShip)
+    console.log('Must stay ' + ((fleet[i].amount * lifeForShip) - damagePerShips) / lifeForShip + ' ships after battle')
+    const shipsSurviving = Math.round(((fleet[i].amount * lifeForShip) - damagePerShips) / lifeForShip)
+    console.log('Was :' + fleet[i].amount + ' and now: ' + shipsSurviving)
+    fleetSurviving[fleet[i].shipId] = {amount: shipsSurviving}
+    totalCapacity += ships[fleet[i].shipId].capacity * shipsSurviving
+    survivingShips += shipsSurviving
+  }
+  return {fleet: fleetSurviving, capacity: totalCapacity, survivingShips: survivingShips}
+}
+
+function calculateAttackPoints (fleet, ships) {
+  var attackPoints = 0
+  for (var i = 0; i < fleet.length; i++) {
+    if (ships.hasOwnProperty(fleet[i].shipId)) {
+      attackPoints += getRandomArbitrary(ships[fleet[i].shipId].minAttack, ships[fleet[i].shipId].maxAttack) * fleet[i].amount
+    }
+  }
+  return attackPoints
+}
+
+function calculateShieldPoints (fleet, ships) {
+  var attackPoints = 0
+  for (var i = 0; i < fleet.length; i++) {
+    if (ships.hasOwnProperty(fleet[i].shipId)) {
+      attackPoints += ships[fleet[i].shipId].shield * fleet[i].amount
+    }
+  }
+  return attackPoints
+}
+
+function getRandomArbitrary (min, max) {
+  return Math.random() * (max - min) + min
 }
 
 module.exports = queue

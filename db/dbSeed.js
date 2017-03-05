@@ -52,6 +52,7 @@ var seed = {
     refShips.update(
       {
         0: {
+          'shipId': 0,
           'name': 'Chasseur léger',
           'spatioportLevelNeeded': 0,
           'timeToBuild': 30,
@@ -61,9 +62,11 @@ var seed = {
           'maxAttack': 60,
           'life': 60,
           'shield': 15,
-          'speed': 1000
+          'speed': 1000,
+          'capacity': 30
         },
         1: {
+          'shipId': 1,
           'name': 'Chasseur lourd',
           'spatioportLevelNeeded': 2,
           'timeToBuild': 60,
@@ -73,9 +76,11 @@ var seed = {
           'maxAttack': 110,
           'life': 120,
           'shield': 50,
-          'speed': 850
+          'speed': 850,
+          'capacity': 100
         },
         2: {
+          'shipId': 2,
           'name': 'Sonde d\'espionnage',
           'spatioportLevelNeeded': 0,
           'timeToBuild': 10,
@@ -85,7 +90,8 @@ var seed = {
           'maxAttack': 1,
           'life': 1,
           'shield': 1,
-          'speed': 15000
+          'speed': 15000,
+          'capacity': 2
         }
       }
     )

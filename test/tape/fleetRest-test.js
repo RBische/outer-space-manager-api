@@ -50,6 +50,7 @@ test('POST /api/v1/ships/create/:shipId', function (assert) {
 test('POST /api/v1/fleet/attack/alansearch', function (assert) {
   return new Promise(function (resolve, reject) {
     db.ref('outer-space-manager/users/alan').update({fleet: {0: {
+      'shipId': 0,
       'name': 'Chasseur léger',
       'spatioportLevelNeeded': 0,
       'timeToBuild': 30,
@@ -64,6 +65,27 @@ test('POST /api/v1/fleet/attack/alansearch', function (assert) {
     }}}, function (err) {
       console.log(err)
       resolve()
+    })
+  })
+  .then(function (res) {
+    return new Promise(function (resolve, reject) {
+      db.ref('outer-space-manager/users/alansearch').update({fleet: {0: {
+        'shipId': 0,
+        'name': 'Chasseur léger',
+        'spatioportLevelNeeded': 0,
+        'timeToBuild': 30,
+        'mineralCost': 300,
+        'gasCost': 100,
+        'minAttack': 40,
+        'maxAttack': 60,
+        'life': 60,
+        'shield': 15,
+        'speed': 1000,
+        'amount': 1
+      }}}, function (err) {
+        console.log(err)
+        resolve()
+      })
     })
   })
   .then(function (res) {
