@@ -7,6 +7,40 @@ var db = admin.database()
 var ref = db.ref('outer-space-manager')
 
 var building = {
+  /**
+   * @api {get} /api/vXXX/buildings Get buildings
+   * @apiDescription Get the list of available buildings
+   * @apiName GetBuildings
+   * @apiGroup Buildings
+   * @apiVersion 1.0.0
+   *
+   * @apiHeader {String} x-access-token The access token of the user
+   *
+   * @apiExample {curl} Example usage:
+   *     curl -X GET -H "x-access-token: $token$" "https://outer-space-manager.herokuapp.com/api/v1/buildings"
+   * @apiSuccessExample {json} Success
+   *     HTTP/1.1 200 OK
+   *     {
+   *      "size": 3,
+   *      "buildings": [
+   *       {
+   *        "amountOfEffectByLevel": 30,
+   *        "amountOfEffectLevel0": 0,
+   *        "effect": "speed_building",
+   *        "gasCostByLevel": 200,
+   *        "gasCostLevel0": 100,
+   *        "mineralCostByLevel": 200,
+   *        "mineralCostLevel0": 100,
+   *        "name": "Usine de nanites",
+   *        "timeToBuildByLevel": 200,
+   *        "timeToBuildLevel0": 60
+   *       }
+   *      ]
+   *     }
+   * @apiError no_buildings_found No buildings were found (404)
+   * @apiError invalid_access_token The token supplied is not valid (403)
+   * @apiError server_bad_response The server did not handle the request correctly (500)
+   */
   getBuildings: function (req, res) {
     var buildingsRef = ref.child('buildings')
     buildingsRef.once('value', function (snapshot) {
@@ -27,6 +61,43 @@ var building = {
       console.log('Error fetching user : ' + errorObject)
     })
   },
+  /**
+   * @api {get} /api/vXXX/buildings/list Get buildings for user
+   * @apiDescription Get the list of buildings built for the current user
+   * @apiName GetUserBuildings
+   * @apiGroup Buildings
+   * @apiVersion 1.0.0
+   *
+   * @apiHeader {String} x-access-token The access token of the user
+   *
+   * @apiExample {curl} Example usage:
+   *     curl -X GET -H "x-access-token: $token$" "https://outer-space-manager.herokuapp.com/api/v1/buildings/list"
+   * @apiSuccessExample {json} Success
+   *HTTP/1.1 200 OK
+   *{
+  "size": 1,
+  "buildings": [
+    {
+      "amountOfEffectByLevel": 30,
+      "amountOfEffectLevel0": 0,
+      "building": false,
+      "effect": "speed_building",
+      "gasCostByLevel": 200,
+      "gasCostLevel0": 100,
+      "level": 2,
+      "mineralCostByLevel": 200,
+      "mineralCostLevel0": 100,
+      "name": "Usine de nanites",
+      "timeToBuildByLevel": 200,
+      "timeToBuildLevel0": 60
+    }
+  ]
+}
+   * @apiError no_buildings_found No buildings were found (404)
+   * @apiError invalid_request Missing credentials (401)
+   * @apiError invalid_access_token The token supplied is not valid (403)
+   * @apiError server_bad_response The server did not handle the request correctly (500)
+   */
   getBuildingsForUser: function (req, res) {
     if (req.user.username !== undefined) {
       console.log('Current username:' + req.user.username)
@@ -53,6 +124,29 @@ var building = {
       return
     }
   },
+  /**
+   * @api {get} /api/vXXX/buildings/create/:buildingId Create building for user
+   * @apiDescription Create a specific building for an user
+   * @apiName CreateBuilding
+   * @apiGroup Buildings
+   * @apiVersion 1.0.0
+   *
+   * @apiHeader {String} x-access-token The access token of the user
+   * @apiParam {String} buildingId The building that the user wants to create
+   *
+   * @apiExample {curl} Example usage:
+   *     curl -X GET -H "x-access-token: $token$" "https://outer-space-manager.herokuapp.com/api/v1/buildings/create/0"
+   * @apiSuccessExample {json} Success
+   *HTTP/1.1 200 OK
+   *{"code":"ok"}
+   * @apiError no_buildings_found No buildings were found (404)
+   * @apiError invalid_request Missing credentials or missing buildingId (401)
+   * @apiError already_in_queue The building is already in queue for being upgraded (401)
+   * @apiError not_enough_resources The user does not have sufficient resources (401)
+   * @apiError invalid_access_token The token supplied is not valid (403)
+   * @apiError server_bad_response The server did not handle the request correctly (500)
+   * @apiError internal_error The server did not handle the request correctly (500)
+   */
   createBuildingForUser: function (req, res) {
     if (req.user !== undefined || req.user.username !== undefined || req.params.buildingId !== undefined) {
       var user = req.user
