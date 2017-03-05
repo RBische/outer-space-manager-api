@@ -95,6 +95,7 @@ router.post('/api/v1/searches/create/:searchId', searches.createSearchForUser)
 router.get('/api/v1/ships', fleetRest.getShips)
 router.get('/api/v1/fleet/list', fleetRest.getShipsForUser)
 router.post('/api/v1/ships/create/:shipId', fleetRest.createShip)
+router.get('/api/v1/users/:from/:limit', userRest.getUsers)
 
 app.use('/', router)
 if (module.parent === null) {

@@ -54,6 +54,78 @@ var user = {
       function (errorObject) {
         console.log(errorObject)
       })
+  },
+  /**
+   * @api {get} /api/vXXX/users/:from/:limit Get users
+   * @apiDescription Get users ordered by score desc
+   * @apiName GetUsers
+   * @apiGroup Users
+   * @apiVersion 1.0.0
+   *
+   * @apiHeader {String} x-access-token The access token of the user
+   *
+   * @apiExample {curl} Example usage:
+   *     curl -X GET -H "x-access-token: $token$" "https://outer-space-manager.herokuapp.com/api/v1/users/0/3"
+   * @apiSuccessExample {json} Success
+   *HTTP/1.1 200 OK
+   *{
+  "users": {
+    "alan": {
+      "points": 3910,
+      "username": "alan"
+    },
+    "alanee": {
+      "points": 0,
+      "username": "alanee"
+    },
+    "alansearch": {
+      "points": 630,
+      "username": "alansearch"
+    }
+  }
+}
+   * @apiError invalid_request Missing limit or from param or not valid value in these params (401)
+   * @apiError invalid_access_token The token supplied is not valid (403)
+   */
+  getUsers: function (req, res, next) {
+    if (req.params.from !== undefined && req.params.limit !== undefined && req.params.limit > 0 && req.params.from >= 0 && req.params.limit <= 20) {
+      const limit = req.params.limit
+      console.log('Fetching users from ' + req.params.from + ' with limit ' + limit)
+      var usersRef = ref.child('users')
+        .orderByChild('pointsInv')
+        .startAt(parseInt(req.params.from))
+        .limitToFirst(parseInt(limit))
+      usersRef.once('value', function (snapshot) {
+        console.log('Successfully fetched users')
+        var usersFetched = snapshot.val()
+
+        if (!usersFetched) {
+          res.json({
+            size: 0,
+            users: {}
+          })
+        } else {
+          const allowedKeys = ['username', 'points']
+          for (var key in usersFetched) {
+            if (usersFetched.hasOwnProperty(key)) {
+              for (var subkey in usersFetched[key]) {
+                if (!allowedKeys.includes(subkey)) {
+                  delete usersFetched[key][subkey]
+                }
+              }
+            }
+          }
+          res.json({
+            size: usersFetched.length,
+            users: usersFetched
+          })
+        }
+      }, function (errorObject) {
+        console.log('Error fetching user : ' + errorObject)
+      })
+    } else {
+      res.respond('Invalid request, no from or limit given, or limit <= 0', 'invalid_request', 401)
+    }
   }
 }
 

@@ -77,6 +77,7 @@ function executeItems (keys, items, callback) {
             userRef.once('value', function (snapshot) {
               var userFetched = snapshot.val()
               userFetched.points = userFetched.points + currentItem.points
+              userFetched.pointsInv = 10000000000 - (userFetched.points + currentItem.points)
               ref.child('users/' + currentItem.username).update(userFetched, function (error) {
                 if (error) {
                   console.log('Points not added to user : ' + error)
