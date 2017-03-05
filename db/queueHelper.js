@@ -266,6 +266,7 @@ function handleAttack (currentItem, keys, items, callback) {
             })
             .then(function (fbRes) {
               console.log('Creating reports')
+              // TODO: add in report the informations for the attacked user minerals
               return ref.child('users/' + messageObject.toUser + '/reports').push({type: 'attacked',
                 date: currentItem.executionTime,
                 defenderFleet: defenderFleet,

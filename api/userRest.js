@@ -59,7 +59,7 @@ var user = {
    * @api {get} /api/vXXX/users/:from/:limit Get users
    * @apiDescription Get users ordered by score desc
    * @apiName GetUsers
-   * @apiGroup Users
+   * @apiGroup User
    * @apiVersion 1.0.0
    *
    * @apiHeader {String} x-access-token The access token of the user
@@ -126,6 +126,42 @@ var user = {
     } else {
       res.respond('Invalid request, no from or limit given, or limit <= 0', 'invalid_request', 401)
     }
+  },
+  /**
+   * @api {get} /api/vXXX/users/get Get current user
+   * @apiDescription Get the current user and his informations
+   * @apiName GetUser
+   * @apiGroup User
+   * @apiVersion 1.0.0
+   *
+   * @apiHeader {String} x-access-token The access token of the user
+   *
+   * @apiExample {curl} Example usage:
+   *     curl -X GET -H "x-access-token: $token$" "https://outer-space-manager.herokuapp.com/api/v1/users/get"
+   * @apiSuccessExample {json} Success
+   *HTTP/1.1 200 OK
+   *{
+  "gas": 1341.3615000000002,
+  "gasModifier": 1,
+  "minerals": 1966.1784000000002,
+  "mineralsModifier": 1,
+  "points": 630,
+  "username": "alansearch"
+}
+   * @apiError invalid_request Missing limit or from param or not valid value in these params (401)
+   * @apiError invalid_access_token The token supplied is not valid (403)
+   */
+  getCurrentUser: function (req, res, next) {
+    const user = req.user
+    const allowedKeys = ['username', 'points', 'gas', 'gasModifier', 'minerals', 'mineralsModifier', 'reports', 'username']
+    for (var key in user) {
+      if (user.hasOwnProperty(key)) {
+        if (!allowedKeys.includes(key)) {
+          delete user[key]
+        }
+      }
+    }
+    res.json(user)
   }
 }
 
