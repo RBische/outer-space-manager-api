@@ -35,7 +35,7 @@ var seed = {
         },
         2: {
           'name': 'Mine automatisée',
-          'effect_added': 'speed_fleet',
+          'effect_added': 'mineral_modifier',
           'amountOfEffectByLevel': 100,
           'amountOfEffectLevel0': 100,
           'timeToBuildByLevel': 200,
@@ -74,6 +74,18 @@ var seed = {
           'life': 120,
           'shield': 50,
           'speed': 850
+        },
+        2: {
+          'name': 'Sonde d\'espionnage',
+          'spatioportLevelNeeded': 0,
+          'timeToBuild': 10,
+          'mineralCost': 10,
+          'gasCost': 5,
+          'minAttack': 1,
+          'maxAttack': 1,
+          'life': 1,
+          'shield': 1,
+          'speed': 15000
         }
       }
     )

@@ -5,23 +5,25 @@ var ref = db.ref('outer-space-manager')
 var running = false
 var queue = {
   addToQueue: function (objectType, object, key, executionTime, points, username, callback, amount) {
-    queueRef.child((executionTime)).update(
-      {
-        objectType: objectType,
-        object: object,
-        key: key,
-        executionTime: executionTime,
-        username: username,
-        points: points,
-        amount: amount || 0
-      }, function (error) {
-      if (error) {
-        console.log('Data in queue could not be saved.' + error)
-      } else {
-        console.log('Data in queue saved successfully.')
-      }
-      callback()
+    const objectToSave = {
+      objectType: objectType,
+      object: object,
+      key: key,
+      executionTime: executionTime,
+      username: username,
+      points: points,
+      amount: amount || 0
     }
+    queueRef.child((executionTime)).update(
+      objectToSave, function (error) {
+        if (error) {
+          console.log('Data in queue could not be saved.' + error)
+        } else {
+          console.log('Data in queue saved successfully.')
+          console.log(objectToSave)
+        }
+        callback()
+      }
     )
   },
   clearQueue: function () {
@@ -157,7 +159,7 @@ function executeItems (keys, items, callback) {
           }
         )
       }
-      if (currentItem.objectType === 'ships') {
+      if (currentItem.objectType === 'ships' || currentItem.objectType === 'attack') {
         afterModifying()
       } else {
         ref.child(currentItem.key).update(

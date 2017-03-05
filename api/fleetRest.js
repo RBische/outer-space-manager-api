@@ -5,7 +5,7 @@ const db = admin.database()
 const ref = db.ref('outer-space-manager')
 const globalConfig = require('../config/globalConfig')
 const userRest = require('../api/userRest')
-
+var userMakingRequest = []
 const fleet = {
   /**
    * @api {get} /api/vXXX/buildings Get ships
@@ -272,6 +272,105 @@ const fleet = {
           )
         })
       })
+  },
+
+  /**
+   * @api {post} /api/v1/fleet/attack/:userName Attack an user
+   * @apiDescription Attack an user with the current user fleet
+   * @apiName Attack
+   * @apiGroup Fleet
+   * @apiVersion 1.0.0
+   *
+   * @apiParam {Integer} userName The user to attack
+   * @apiParam {Object[]} ships The ships used for the attack
+   * @apiParam {Integer} ships.shipId ShipId used for the attack
+   * @apiParam {Integer} ships.amout Amount of this ship used for the attack
+   *
+   * @apiSuccessExample {json} Success
+   *     HTTP/1.1 200 OK
+   *     {
+   *       internalCode: "ok"
+   *     }
+   * @apiError invalid_request Missing ships or username (401)
+   * @apiError not_enough_ships Not enough resources to build these ships (401)
+   * @apiError no_ships_found This ship does not exist (404)
+   * @apiError internal_error Something went wrong, try again later (500)
+   */
+  attack: function (req, res, next) {
+    if (req.params.userName !== undefined && req.body.ships !== undefined && req.body.ships.length > 0 && !userMakingRequest.includes(req.user.username)) {
+      userMakingRequest.push(req.user.username)
+      const attackFleet = []
+      var minSpeed = 150000
+      console.log('Current fleet:' + JSON.stringify(req.user.fleet))
+      for (var i = 0; i < req.body.ships.length; i++) {
+        if (req.body.ships[i].hasOwnProperty('shipId') && req.body.ships[i].hasOwnProperty('amount')) {
+          if (req.user.fleet &&
+            req.user.fleet[req.body.ships[i].shipId] &&
+            req.user.fleet[req.body.ships[i].shipId].amount &&
+            req.user.fleet[req.body.ships[i].shipId].amount >= req.body.ships[i].amount) {
+            if (req.user.fleet[req.body.ships[i].shipId].speed < minSpeed) {
+              minSpeed = req.user.fleet[req.body.ships[i].shipId].speed
+            }
+            attackFleet.push({shipId: req.body.ships[i].shipId, amount: req.body.ships[i].amount})
+          }
+        }
+      }
+      if (attackFleet.length > 0) {
+        const attackedUserRef = ref.child('users/' + req.params.userName)
+        return new Promise(function (resolve, reject) {
+          attackedUserRef.once('value', function (snapshot) {
+            var userFetched = snapshot.val()
+            if (userFetched == null) {
+              res.respond('No user corresponding found', 'invalid_request', 401)
+              reject()
+            } else {
+              resolve(userFetched)
+            }
+          }, function (errorObject) {
+            res.respond('Oups, server is not that ok with your request', 'server_bad_response', 500)
+            reject()
+          })
+        })
+        .then(function (attackedUser) {
+          return new Promise(function (resolve, reject) {
+            const distance = globalConfig.getDistanceFromUsers(attackedUser, req.user)
+            var modifier = 0
+            if (req.user.speed_fleet) {
+              modifier += req.user.speed_fleet
+            }
+            const executionTime = Math.round((2 * distance) / minSpeed - modifier) + Date.now()
+            console.log('Queued in : ' + executionTime + ' with distance: ' + (2 * distance) + ' and min speed :' + minSpeed + ', it is now :' + Date.now())
+            queueHelper.addToQueue('attack', {fromUser: req.user.username, toUser: req.params.userName, fleet: attackFleet}, 'attack', executionTime, 0, req.user.username,
+              function () {
+                const userFleet = req.user.fleet
+                for (var i = 0; i < attackFleet.length; i++) {
+                  userFleet[attackFleet[i].shipId].amount = userFleet[attackFleet[i].shipId].amount - attackFleet[i].amount
+                }
+                return ref.child('users/' + req.user.username + '/fleet/').set(userFleet)
+                .then(function (result) {
+                  res.json({code: 'ok'})
+                  userMakingRequest.splice(userMakingRequest.indexOf(req.user.username), 1)
+                  resolve()
+                })
+                .catch(function (rejection) {
+                  userMakingRequest.splice(userMakingRequest.indexOf(req.user.username), 1)
+                  res.respond('Error in server side', 'internal_error', 500)
+                  resolve()
+                })
+              }
+            )
+          })
+        })
+        .catch(function (rejection) {
+          userMakingRequest.splice(userMakingRequest.indexOf(req.user.username), 1)
+        })
+      } else {
+        userMakingRequest.splice(userMakingRequest.indexOf(req.user.username), 1)
+        res.respond('Invalid request, not enough ships of a kind or something like that', 'invalid_request', 401)
+      }
+    } else {
+      res.respond('Invalid request, no ships given or no username given', 'invalid_request', 401)
+    }
   }
 }
 
