@@ -10,13 +10,18 @@ var user = {
   },
   changeResources: function (username, minerals, gas) {
     var userRef = ref.child('users/' + username)
-    userRef.once('value', function (snapshot) {
+    return userRef.once('value')
+    .then(function (snapshot) {
       var userFetched = snapshot.val()
       userFetched.minerals = userFetched.minerals + minerals
       userFetched.gas = userFetched.gas + gas
-      ref.child('users/' + username).update(userFetched)
+      return userFetched
     }, function (errorObject) {
       console.log('Error giving resources')
+      return Promise.reject({code: 'DbError', errorObject})
+    })
+    .then(function (userFetched) {
+      return ref.child('users/' + username).update(userFetched)
     })
   },
   refreshResources: function (user, callback) {

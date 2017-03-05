@@ -21,6 +21,30 @@ test('GET /api/v1/ships', function (assert) {
   })
 })
 
+test('POST /api/v1/ships/create/:shipId', function (assert) {
+  require('../../api/userRest')
+  .changeResources('alan', 300, 100)
+  .then(function (res) {
+    request(app)
+    .post('/api/v1/ships/create/0')
+    .set('x-access-token', token.token)
+    .send({amount: 1})
+    .expect(200)
+    .end(function (err, res) {
+      console.log(JSON.stringify(err))
+      console.log(JSON.stringify(res))
+      assert.true(err === null)
+      var result = res.body
+      assert.true(result.code === 'ok')
+      assert.end()
+    })
+  })
+  .catch(function (rejection) {
+    assert.fail(rejection)
+    assert.end()
+  })
+})
+
 test('GET /', function (assert) {
   request(app)
   .get('/')

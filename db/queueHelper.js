@@ -4,7 +4,7 @@ var queueRef = db.ref('outer-space-manager/queue')
 var ref = db.ref('outer-space-manager')
 
 var queue = {
-  addToQueue: function (objectType, object, key, executionTime, points, username, callback) {
+  addToQueue: function (objectType, object, key, executionTime, points, username, callback, amount) {
     queueRef.child((executionTime)).update(
       {
         objectType: objectType,
@@ -12,7 +12,8 @@ var queue = {
         key: key,
         executionTime: executionTime,
         username: username,
-        points: points
+        points: points,
+        amount: amount || 0
       }, function (error) {
       if (error) {
         console.log('Data in queue could not be saved.' + error)
@@ -92,6 +93,26 @@ function executeItems (keys, items, callback) {
                       }
                       executeItems(keys, items, callback)
                     })
+                  } else if (currentItem.objectType === 'ships') {
+                    return ref.child(currentItem.key)
+                      .once('value')
+                      .then(function (res) {
+                        if (res.val()) {
+                          const ship = res.val()
+                          console.log('Current ships amount :' + ship.amount)
+                          console.log('Amount in queue :' + currentItem.amount)
+                          ship.amount = ship.amount + currentItem.amount
+                          return ship
+                        } else {
+                          return currentItem.object
+                        }
+                      })
+                      .then(function (ship) {
+                        return ref.child(currentItem.key).update(ship)
+                      })
+                      .then(function (res) {
+                        return executeItems(keys, items, callback)
+                      })
                   } else if (currentItem.object.hasOwnProperty('effect_added') && currentItem.object.hasOwnProperty('level')) {
                     ref.child('users/' + currentItem.username).once('value', function (snapshot) {
                       const userToModify = snapshot.val()
