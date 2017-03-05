@@ -7,6 +7,52 @@ var db = admin.database()
 var ref = db.ref('outer-space-manager')
 
 var search = {
+  /**
+   * @api {get} /api/vXXX/buildings Get searches
+   * @apiDescription Get the list of available searches
+   * @apiName GetSearches
+   * @apiGroup Searches
+   * @apiVersion 1.0.0
+   *
+   * @apiHeader {String} x-access-token The access token of the user
+   *
+   * @apiExample {curl} Example usage:
+   *     curl -X GET -H "x-access-token: $token$" "https://outer-space-manager.herokuapp.com/api/v1/searches"
+   * @apiSuccessExample {json} Success
+   *HTTP/1.1 200 OK
+   *{
+  "size": 2,
+  "searches": [
+    {
+      "amountOfEffectByLevel": 30,
+      "amountOfEffectLevel0": 0,
+      "effect": "speed_building",
+      "gasCostByLevel": 200,
+      "gasCostLevel0": 100,
+      "mineralCostByLevel": 200,
+      "mineralCostLevel0": 100,
+      "name": "Centrale électrique",
+      "timeToBuildByLevel": 200,
+      "timeToBuildLevel0": 60
+    },
+    {
+      "amountOfEffectByLevel": 100,
+      "amountOfEffectLevel0": 100,
+      "effect": "speed_fleet",
+      "gasCostByLevel": 200,
+      "gasCostLevel0": 100,
+      "mineralCostByLevel": 200,
+      "mineralCostLevel0": 100,
+      "name": "Spatioport",
+      "timeToBuildByLevel": 200,
+      "timeToBuildLevel0": 60
+    }
+  ]
+}
+   * @apiError no_searches_found No searches were found (404)
+   * @apiError invalid_access_token The token supplied is not valid (403)
+   * @apiError server_bad_response The server did not handle the request correctly (500)
+   */
   getSearches: function (req, res) {
     var searchesRef = ref.child('searches')
     searchesRef.once('value', function (snapshot) {
@@ -27,6 +73,43 @@ var search = {
       console.log('Error fetching user : ' + errorObject)
     })
   },
+  /**
+   * @api {get} /api/vXXX/searches/list Get searches for user
+   * @apiDescription Get the list of searches done for the current user
+   * @apiName GetUserSearches
+   * @apiGroup Searches
+   * @apiVersion 1.0.0
+   *
+   * @apiHeader {String} x-access-token The access token of the user
+   *
+   * @apiExample {curl} Example usage:
+   *     curl -X GET -H "x-access-token: $token$" "https://outer-space-manager.herokuapp.com/api/v1/searches/list"
+   * @apiSuccessExample {json} Success
+   *HTTP/1.1 200 OK
+   *{
+  "size": 1,
+  "searches": [
+    {
+      "amountOfEffectByLevel": 30,
+      "amountOfEffectLevel0": 0,
+      "building": false,
+      "effect": "speed_building",
+      "gasCostByLevel": 200,
+      "gasCostLevel0": 100,
+      "level": 2,
+      "mineralCostByLevel": 200,
+      "mineralCostLevel0": 100,
+      "name": "Centrale électrique",
+      "timeToBuildByLevel": 200,
+      "timeToBuildLevel0": 60
+    }
+  ]
+}
+   * @apiError no_searches_found No searches were found (404)
+   * @apiError invalid_request Missing credentials (401)
+   * @apiError invalid_access_token The token supplied is not valid (403)
+   * @apiError server_bad_response The server did not handle the request correctly (500)
+   */
   getSearchesForUser: function (req, res) {
     if (req.user.username !== undefined) {
       console.log('Current username:' + req.user.username)
@@ -53,6 +136,29 @@ var search = {
       return
     }
   },
+  /**
+   * @api {get} /api/vXXX/searches/create/:searchId Start research for user
+   * @apiDescription Create a specific research for an user
+   * @apiName CreateSearch
+   * @apiGroup Searches
+   * @apiVersion 1.0.0
+   *
+   * @apiHeader {String} x-access-token The access token of the user
+   * @apiParam {String} searchId The research that the user wants to create
+   *
+   * @apiExample {curl} Example usage:
+   *     curl -X GET -H "x-access-token: $token$" "https://outer-space-manager.herokuapp.com/api/v1/searches/create/0"
+   * @apiSuccessExample {json} Success
+   *HTTP/1.1 200 OK
+   *{"code":"ok"}
+   * @apiError no_searches_found No searches were found (404)
+   * @apiError invalid_request Missing credentials or missing buildingId (401)
+   * @apiError already_in_queue The research is already in queue for being upgraded (401)
+   * @apiError not_enough_resources The user does not have sufficient resources (401)
+   * @apiError invalid_access_token The token supplied is not valid (403)
+   * @apiError server_bad_response The server did not handle the request correctly (500)
+   * @apiError internal_error The server did not handle the request correctly (500)
+   */
   createSearchForUser: function (req, res) {
     console.log('Creating search')
     if (req.user !== undefined || req.user.username !== undefined || req.params.searchId !== undefined) {
