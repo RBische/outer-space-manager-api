@@ -128,6 +128,7 @@ const fleet = {
     }
   },
   constructShips: function (response, user, shipId, amount) {
+    // TODO: Add control on spatioport level
     return ref.child('users/' + user.username + '/fleet/' + shipId)
       .once('value')
       .then(function (res) {
