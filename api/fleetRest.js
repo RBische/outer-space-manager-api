@@ -7,6 +7,52 @@ const globalConfig = require('../config/globalConfig')
 const userRest = require('../api/userRest')
 
 const fleet = {
+  /**
+   * @api {get} /api/vXXX/buildings Get ships
+   * @apiDescription Get the list of available ships
+   * @apiName GetShips
+   * @apiGroup Fleet
+   * @apiVersion 1.0.0
+   *
+   * @apiHeader {String} x-access-token The access token of the user
+   *
+   * @apiExample {curl} Example usage:
+   *     curl -X GET -H "x-access-token: $token$" "https://outer-space-manager.herokuapp.com/api/v1/ships"
+   * @apiSuccessExample {json} Success
+   *HTTP/1.1 200 OK
+   *{
+  "size": 2,
+  "ships": [
+    {
+      "gasCost": 100,
+      "life": 60,
+      "maxAttack": 60,
+      "minAttack": 40,
+      "mineralCost": 300,
+      "name": "Chasseur léger",
+      "shield": 15,
+      "spatioportLevelNeeded": 0,
+      "speed": 1000,
+      "timeToBuild": 30
+    },
+    {
+      "gasCost": 250,
+      "life": 120,
+      "maxAttack": 110,
+      "minAttack": 90,
+      "mineralCost": 600,
+      "name": "Chasseur lourd",
+      "shield": 50,
+      "spatioportLevelNeeded": 2,
+      "speed": 850,
+      "timeToBuild": 60
+    }
+  ]
+}
+   * @apiError no_ships_found No ships were found (404)
+   * @apiError invalid_access_token The token supplied is not valid (403)
+   * @apiError server_bad_response The server did not handle the request correctly (500)
+   */
   getShips: function (req, res) {
     var shipsRef = ref.child('ships')
     shipsRef.once('value', function (snapshot) {
@@ -27,6 +73,42 @@ const fleet = {
       console.log('Error fetching ships : ' + errorObject)
     })
   },
+  /**
+   * @api {get} /api/vXXX/fleet/list Get fleet for user
+   * @apiDescription Get the fleet for the current user
+   * @apiName GetUserFleet
+   * @apiGroup Fleet
+   * @apiVersion 1.0.0
+   *
+   * @apiHeader {String} x-access-token The access token of the user
+   *
+   * @apiExample {curl} Example usage:
+   *     curl -X GET -H "x-access-token: $token$" "https://outer-space-manager.herokuapp.com/api/v1/fleet/list"
+   * @apiSuccessExample {json} Success
+   *HTTP/1.1 200 OK
+   *{
+  "size": 1,
+  "buildings": [
+    {
+      "amountOfEffectByLevel": 30,
+      "amountOfEffectLevel0": 0,
+      "building": false,
+      "effect": "speed_building",
+      "gasCostByLevel": 200,
+      "gasCostLevel0": 100,
+      "level": 2,
+      "mineralCostByLevel": 200,
+      "mineralCostLevel0": 100,
+      "name": "Usine de nanites",
+      "timeToBuildByLevel": 200,
+      "timeToBuildLevel0": 60
+    }
+  ]
+}
+   * @apiError invalid_request Missing credentials (401)
+   * @apiError invalid_access_token The token supplied is not valid (403)
+   * @apiError server_bad_response The server did not handle the request correctly (500)
+   */
   getShipsForUser: function (req, res) {
     if (req.user.username !== undefined) {
       console.log('Current username:' + req.user.username)
@@ -37,12 +119,12 @@ const fleet = {
         if (shipsFetched) {
           res.json({
             size: shipsFetched.length,
-            searches: shipsFetched
+            ships: shipsFetched
           })
         } else {
           res.json({
             size: 0,
-            searches: []
+            ships: []
           })
         }
       }, function (errorObject) {

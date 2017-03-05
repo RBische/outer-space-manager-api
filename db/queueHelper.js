@@ -115,7 +115,8 @@ function executeItems (keys, items, callback) {
                         ship.amount = amount
                         return ship
                       } else {
-                        return currentItem.object
+                        const ret = Object.assign(currentItem.object, {amount: currentItem.amount})
+                        return ret
                       }
                     })
                     .then(function (ship) {

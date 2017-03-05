@@ -1,5 +1,5 @@
 var globalConfig = {
-  mineralsGenerated: 0.5,
+  mineralsGenerated: 0.8,
   gasGenerated: 0.5
 }
 
