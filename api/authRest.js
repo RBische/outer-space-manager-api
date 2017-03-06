@@ -18,7 +18,6 @@ var auth = {
    * @apiSuccessExample {json} Success
    *     HTTP/1.1 200 OK
    *     {
-   *       username: "theUserNameSupplied",
    *       token: "atoken",
    *       expires: "expirationInMilliseconds"
    *     }
@@ -97,7 +96,6 @@ var auth = {
    * @apiSuccessExample {json} Success
    *     HTTP/1.1 200 OK
    *     {
-   *       username: "theUserNameSupplied",
    *       token: "atoken",
    *       expires: "expirationInMilliseconds"
    *     }
