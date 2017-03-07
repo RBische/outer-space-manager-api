@@ -7,52 +7,6 @@ var db = admin.database()
 var ref = db.ref('outer-space-manager')
 
 var search = {
-  /**
-   * @api {get} /api/vXXX/buildings Get searches
-   * @apiDescription Get the list of available searches
-   * @apiName GetSearches
-   * @apiGroup Searches
-   * @apiVersion 1.0.0
-   *
-   * @apiHeader {String} x-access-token The access token of the user
-   *
-   * @apiExample {curl} Example usage:
-   *     curl -X GET -H "x-access-token: $token$" "https://outer-space-manager.herokuapp.com/api/v1/searches"
-   * @apiSuccessExample {json} Success
-   *HTTP/1.1 200 OK
-   *{
-  "size": 2,
-  "searches": [
-    {
-      "amountOfEffectByLevel": 30,
-      "amountOfEffectLevel0": 0,
-      "effect": "speed_building",
-      "gasCostByLevel": 200,
-      "gasCostLevel0": 100,
-      "mineralCostByLevel": 200,
-      "mineralCostLevel0": 100,
-      "name": "Centrale électrique",
-      "timeToBuildByLevel": 200,
-      "timeToBuildLevel0": 60
-    },
-    {
-      "amountOfEffectByLevel": 100,
-      "amountOfEffectLevel0": 100,
-      "effect": "speed_fleet",
-      "gasCostByLevel": 200,
-      "gasCostLevel0": 100,
-      "mineralCostByLevel": 200,
-      "mineralCostLevel0": 100,
-      "name": "Spatioport",
-      "timeToBuildByLevel": 200,
-      "timeToBuildLevel0": 60
-    }
-  ]
-}
-   * @apiError no_searches_found No searches were found (404)
-   * @apiError invalid_access_token The token supplied is not valid (403)
-   * @apiError server_bad_response The server did not handle the request correctly (500)
-   */
   getSearches: function (req, res) {
     var searchesRef = ref.child('searches')
     searchesRef.once('value', function (snapshot) {
@@ -99,13 +53,12 @@ var search = {
       "level": 2,
       "mineralCostByLevel": 200,
       "mineralCostLevel0": 100,
-      "name": "Centrale électrique",
+      "name": "Recherche robotique",
       "timeToBuildByLevel": 200,
       "timeToBuildLevel0": 60
     }
   ]
 }
-   * @apiError no_searches_found No searches were found (404)
    * @apiError invalid_request Missing credentials (401)
    * @apiError invalid_access_token The token supplied is not valid (403)
    * @apiError server_bad_response The server did not handle the request correctly (500)
@@ -114,23 +67,35 @@ var search = {
     if (req.user.username !== undefined) {
       console.log('Current username:' + req.user.username)
       var searchesRef = ref.child('users/' + req.user.username + '/searches')
-      searchesRef.once('value', function (snapshot) {
-        console.log('Successfully fetched searches for user')
-        var searchFetched = snapshot.val()
-
-        if (!searchFetched) {
-          res.respond('No searches found', 'no_searches_found', 404)
-          return
-        }
-        if (searchFetched) {
+      searchesRef.once('value')
+        .then(function (snapshotUser) {
+          const allSearchesRef = ref.child('searches')
+          return allSearchesRef.once('value')
+            .then(function (snapshot) {
+              return {searches: snapshot.val(), userSearches: snapshotUser.val()}
+            })
+        })
+        .then(function (searches) {
+          console.log('Successfully fetched searches for user')
+          const searchesRet = []
+          console.log('User searches:' + JSON.stringify(searches.userSearches))
+          for (var keySearch in searches.searches) {
+            if (searches.searches.hasOwnProperty(keySearch)) {
+              var currentSearch = searches.searches[keySearch]
+              console.log('Current search: ' + JSON.stringify(currentSearch))
+              if (searches.userSearches && searches.userSearches[currentSearch.searchId]) {
+                currentSearch = Object.assign({level: searches.userSearches[currentSearch.searchId].level}, currentSearch)
+              } else {
+                currentSearch = Object.assign({level: 0}, currentSearch)
+              }
+              searchesRet.push(currentSearch)
+            }
+          }
           res.json({
-            size: searchFetched.length,
-            searches: searchFetched
+            size: searchesRet.length,
+            searches: searchesRet
           })
-        }
-      }, function (errorObject) {
-        console.log('Error fetching user : ' + errorObject)
-      })
+        })
     } else {
       res.respond('Invalid request, no username given', 'invalid_request', 401)
       return
@@ -147,7 +112,7 @@ var search = {
    * @apiParam {String} searchId The research that the user wants to create
    *
    * @apiExample {curl} Example usage:
-   *     curl -X GET -H "x-access-token: $token$" "https://outer-space-manager.herokuapp.com/api/v1/searches/create/0"
+   *     curl -X POST -H "x-access-token: $token$" "https://outer-space-manager.herokuapp.com/api/v1/searches/create/0"
    * @apiSuccessExample {json} Success
    *HTTP/1.1 200 OK
    *{"code":"ok"}

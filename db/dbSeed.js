@@ -38,7 +38,7 @@ var seed = {
         2: {
           'buildingId': 2,
           'name': 'Mine automatisée',
-          'effect_added': 'mineral_modifier',
+          'effectAdded': 'mineral_modifier',
           'amountOfEffectByLevel': 100,
           'amountOfEffectLevel0': 100,
           'timeToBuildByLevel': 200,
@@ -103,7 +103,7 @@ var seed = {
     refSearches.update(
       {
         0: {
-          'name': 'Centrale électrique',
+          'name': 'Recherche robotique',
           'effect': 'speed_building',
           'amountOfEffectByLevel': 30,
           'amountOfEffectLevel0': 0,
@@ -115,7 +115,7 @@ var seed = {
           'gasCostLevel0': 100
         },
         1: {
-          'name': 'Spatioport',
+          'name': 'Recherche moteurs',
           'effect': 'speed_fleet',
           'amountOfEffectByLevel': 100,
           'amountOfEffectLevel0': 100,

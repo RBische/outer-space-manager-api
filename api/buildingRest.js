@@ -78,6 +78,7 @@ var building = {
         .then(function (buildings) {
           console.log('Successfully fetched buildings for user')
           const buildingsRet = []
+          console.log('User buildings:' + JSON.stringify(buildings.userBuildings))
           for (var keyBuilding in buildings.buildings) {
             if (buildings.buildings.hasOwnProperty(keyBuilding)) {
               var currentBuilding = buildings.buildings[keyBuilding]
@@ -108,10 +109,10 @@ var building = {
    * @apiVersion 1.0.0
    *
    * @apiHeader {String} x-access-token The access token of the user
-   * @apiParam {String} buildingId The building that the user wants to create
+   * @apiParam {Integer} buildingId The building that the user wants to create
    *
    * @apiExample {curl} Example usage:
-   *     curl -X GET -H "x-access-token: $token$" "https://outer-space-manager.herokuapp.com/api/v1/buildings/create/0"
+   *     curl -X POST -H "x-access-token: $token$" "https://outer-space-manager.herokuapp.com/api/v1/buildings/create/0"
    * @apiSuccessExample {json} Success
    *HTTP/1.1 200 OK
    *{"code":"ok"}
