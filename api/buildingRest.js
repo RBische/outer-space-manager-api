@@ -41,6 +41,7 @@ var building = {
    * @apiError invalid_access_token The token supplied is not valid (403)
    * @apiError server_bad_response The server did not handle the request correctly (500)
    */
+   // TODO: Merge get buildings and get current buildings
   getBuildings: function (req, res) {
     var buildingsRef = ref.child('buildings')
     buildingsRef.once('value', function (snapshot) {
@@ -93,7 +94,6 @@ var building = {
     }
   ]
 }
-   * @apiError no_buildings_found No buildings were found (404)
    * @apiError invalid_request Missing credentials (401)
    * @apiError invalid_access_token The token supplied is not valid (403)
    * @apiError server_bad_response The server did not handle the request correctly (500)
@@ -107,8 +107,10 @@ var building = {
         var buildingFetched = snapshot.val()
 
         if (!buildingFetched) {
-          res.respond('No buildings found', 'no_buildings_found', 404)
-          return
+          res.json({
+            size: 0,
+            buildings: []
+          })
         }
         if (buildingFetched) {
           res.json({
