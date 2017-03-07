@@ -10,6 +10,7 @@ var seed = {
     refBuildings.update(
       {
         0: {
+          'buildingId': 0,
           'name': 'Usine de nanites',
           'effect': 'speed_building',
           'amountOfEffectByLevel': 30,
@@ -22,6 +23,7 @@ var seed = {
           'gasCostLevel0': 100
         },
         1: {
+          'buildingId': 1,
           'name': 'Spatioport',
           'effect': 'speed_fleet',
           'amountOfEffectByLevel': 100,
@@ -34,6 +36,7 @@ var seed = {
           'gasCostLevel0': 100
         },
         2: {
+          'buildingId': 2,
           'name': 'Mine automatisée',
           'effect_added': 'mineral_modifier',
           'amountOfEffectByLevel': 100,

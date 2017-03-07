@@ -127,7 +127,7 @@ var building = {
     }
   },
   /**
-   * @api {get} /api/vXXX/buildings/create/:buildingId Create building for user
+   * @api {post} /api/vXXX/buildings/create/:buildingId Create building for user
    * @apiDescription Create a specific building for an user
    * @apiName CreateBuilding
    * @apiGroup Buildings
