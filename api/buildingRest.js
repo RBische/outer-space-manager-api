@@ -7,41 +7,6 @@ var db = admin.database()
 var ref = db.ref('outer-space-manager')
 
 var building = {
-  /**
-   * @api {get} /api/vXXX/buildings Get buildings
-   * @apiDescription Get the list of available buildings
-   * @apiName GetBuildings
-   * @apiGroup Buildings
-   * @apiVersion 1.0.0
-   *
-   * @apiHeader {String} x-access-token The access token of the user
-   *
-   * @apiExample {curl} Example usage:
-   *     curl -X GET -H "x-access-token: $token$" "https://outer-space-manager.herokuapp.com/api/v1/buildings"
-   * @apiSuccessExample {json} Success
-   *     HTTP/1.1 200 OK
-   *     {
-   *      "size": 3,
-   *      "buildings": [
-   *       {
-   *        "amountOfEffectByLevel": 30,
-   *        "amountOfEffectLevel0": 0,
-   *        "effect": "speed_building",
-   *        "gasCostByLevel": 200,
-   *        "gasCostLevel0": 100,
-   *        "mineralCostByLevel": 200,
-   *        "mineralCostLevel0": 100,
-   *        "name": "Usine de nanites",
-   *        "timeToBuildByLevel": 200,
-   *        "timeToBuildLevel0": 60
-   *       }
-   *      ]
-   *     }
-   * @apiError no_buildings_found No buildings were found (404)
-   * @apiError invalid_access_token The token supplied is not valid (403)
-   * @apiError server_bad_response The server did not handle the request correctly (500)
-   */
-   // TODO: Merge get buildings and get current buildings
   getBuildings: function (req, res) {
     var buildingsRef = ref.child('buildings')
     buildingsRef.once('value', function (snapshot) {
@@ -102,25 +67,34 @@ var building = {
     if (req.user.username !== undefined) {
       console.log('Current username:' + req.user.username)
       var buildingsRef = ref.child('users/' + req.user.username + '/buildings')
-      buildingsRef.once('value', function (snapshot) {
-        console.log('Successfully fetched buildings for user')
-        var buildingFetched = snapshot.val()
-
-        if (!buildingFetched) {
+      buildingsRef.once('value')
+        .then(function (snapshotUser) {
+          const allBuildingsRef = ref.child('buildings')
+          return allBuildingsRef.once('value')
+            .then(function (snapshot) {
+              return {buildings: snapshot.val(), userBuildings: snapshotUser.val()}
+            })
+        })
+        .then(function (buildings) {
+          console.log('Successfully fetched buildings for user')
+          const buildingsRet = []
+          for (var keyBuilding in buildings.buildings) {
+            if (buildings.buildings.hasOwnProperty(keyBuilding)) {
+              var currentBuilding = buildings.buildings[keyBuilding]
+              console.log('Current building: ' + JSON.stringify(currentBuilding))
+              if (buildings.userBuildings && buildings.userBuildings[currentBuilding.buildingId]) {
+                currentBuilding = Object.assign({level: buildings.userBuildings[currentBuilding.buildingId].level}, currentBuilding)
+              } else {
+                currentBuilding = Object.assign({level: 0}, currentBuilding)
+              }
+              buildingsRet.push(currentBuilding)
+            }
+          }
           res.json({
-            size: 0,
-            buildings: []
+            size: buildingsRet.length,
+            buildings: buildingsRet
           })
-        }
-        if (buildingFetched) {
-          res.json({
-            size: buildingFetched.length,
-            buildings: buildingFetched
-          })
-        }
-      }, function (errorObject) {
-        console.log('Error fetching user : ' + errorObject)
-      })
+        })
     } else {
       res.respond('Invalid request, no username given', 'invalid_request', 401)
       return
