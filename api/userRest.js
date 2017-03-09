@@ -98,11 +98,11 @@ var user = {
       usersRef.once('value', function (snapshot) {
         console.log('Successfully fetched users')
         var usersFetched = snapshot.val()
-
+        var usersReturned = []
         if (!usersFetched) {
           res.json({
             size: 0,
-            users: {}
+            users: []
           })
         } else {
           const allowedKeys = ['username', 'points']
@@ -113,11 +113,12 @@ var user = {
                   delete usersFetched[key][subkey]
                 }
               }
+              usersReturned.push(usersFetched[key])
             }
           }
           res.json({
             size: usersFetched.length,
-            users: usersFetched
+            users: usersReturned
           })
         }
       }, function (errorObject) {
