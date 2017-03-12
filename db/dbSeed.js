@@ -12,6 +12,7 @@ var seed = {
         0: {
           'buildingId': 0,
           'name': 'Usine de nanites',
+          'imageUrl': 'http://www.raphaelbischof.fr/img/usine.jpg',
           'effect': 'speed_building',
           'amountOfEffectByLevel': 30,
           'amountOfEffectLevel0': 0,
@@ -25,6 +26,7 @@ var seed = {
         1: {
           'buildingId': 1,
           'name': 'Spatioport',
+          'imageUrl': 'http://www.raphaelbischof.fr/img/spatioport.jpg',
           'effect': 'speed_fleet',
           'amountOfEffectByLevel': 100,
           'amountOfEffectLevel0': 100,
@@ -38,6 +40,7 @@ var seed = {
         2: {
           'buildingId': 2,
           'name': 'Mine automatisée',
+          'imageUrl': 'http://www.raphaelbischof.fr/img/mine.jpg',
           'effectAdded': 'mineral_modifier',
           'amountOfEffectByLevel': 100,
           'amountOfEffectLevel0': 100,

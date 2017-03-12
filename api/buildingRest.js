@@ -44,13 +44,14 @@ var building = {
   "size": 1,
   "buildings": [
     {
+      "level": 0,
       "amountOfEffectByLevel": 30,
       "amountOfEffectLevel0": 0,
-      "building": false,
+      "buildingId": 0,
       "effect": "speed_building",
       "gasCostByLevel": 200,
       "gasCostLevel0": 100,
-      "level": 2,
+      "imageUrl": "http://www.raphaelbischof.fr/img/usine.jpg",
       "mineralCostByLevel": 200,
       "mineralCostLevel0": 100,
       "name": "Usine de nanites",
