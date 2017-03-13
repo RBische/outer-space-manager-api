@@ -90,20 +90,10 @@ const fleet = {
    *HTTP/1.1 200 OK
    *{
   "size": 1,
-  "buildings": [
+  "ships": [
     {
-      "amountOfEffectByLevel": 30,
-      "amountOfEffectLevel0": 0,
-      "building": false,
-      "effect": "speed_building",
-      "gasCostByLevel": 200,
-      "gasCostLevel0": 100,
-      "level": 2,
-      "mineralCostByLevel": 200,
-      "mineralCostLevel0": 100,
-      "name": "Usine de nanites",
-      "timeToBuildByLevel": 200,
-      "timeToBuildLevel0": 60
+      "amount": 30,
+      [Ship details....]
     }
   ]
 }
