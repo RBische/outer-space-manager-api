@@ -48,6 +48,7 @@ var building = {
       "amountOfEffectByLevel": 30,
       "amountOfEffectLevel0": 0,
       "buildingId": 0,
+      "building": false,
       "effect": "speed_building",
       "gasCostByLevel": 200,
       "gasCostLevel0": 100,
@@ -85,9 +86,9 @@ var building = {
               var currentBuilding = buildings.buildings[keyBuilding]
               console.log('Current building: ' + JSON.stringify(currentBuilding))
               if (buildings.userBuildings && buildings.userBuildings[currentBuilding.buildingId]) {
-                currentBuilding = Object.assign({level: buildings.userBuildings[currentBuilding.buildingId].level}, currentBuilding)
+                currentBuilding = Object.assign({level: buildings.userBuildings[currentBuilding.buildingId].level, building: buildings.userBuildings[currentBuilding.buildingId].building}, currentBuilding)
               } else {
-                currentBuilding = Object.assign({level: 0}, currentBuilding)
+                currentBuilding = Object.assign({level: 0, building: false}, currentBuilding)
               }
               buildingsRet.push(currentBuilding)
             }
