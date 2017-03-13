@@ -8,7 +8,7 @@ const userRest = require('../api/userRest')
 var userMakingRequest = []
 const fleet = {
   /**
-   * @api {get} /api/vXXX/buildings Get ships
+   * @api {get} /api/vXXX/ships Get ships
    * @apiDescription Get the list of available ships
    * @apiName GetShips
    * @apiGroup Fleet
@@ -30,6 +30,7 @@ const fleet = {
       "minAttack": 40,
       "mineralCost": 300,
       "name": "Chasseur léger",
+      "shipId": 0,
       "shield": 15,
       "spatioportLevelNeeded": 0,
       "speed": 1000,
@@ -41,6 +42,7 @@ const fleet = {
       "maxAttack": 110,
       "minAttack": 90,
       "mineralCost": 600,
+      "shipId": 1,
       "name": "Chasseur lourd",
       "shield": 50,
       "spatioportLevelNeeded": 2,
