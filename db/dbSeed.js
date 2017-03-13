@@ -96,8 +96,36 @@ var seed = {
           'maxAttack': 1,
           'life': 1,
           'shield': 1,
-          'speed': 15000,
+          'speed': 150000,
           'capacity': 2
+        },
+        3: {
+          'shipId': 3,
+          'name': 'Destroyer',
+          'spatioportLevelNeeded': 2,
+          'timeToBuild': 180,
+          'mineralCost': 0,
+          'gasCost': 1000,
+          'minAttack': 100,
+          'maxAttack': 150,
+          'life': 5,
+          'shield': 100,
+          'speed': 800,
+          'capacity': 250
+        },
+        4: {
+          'shipId': 4,
+          'name': 'Etoile de la mort',
+          'spatioportLevelNeeded': 6,
+          'timeToBuild': 10,
+          'mineralCost': 5000,
+          'gasCost': 5000,
+          'minAttack': 1400,
+          'maxAttack': 1600,
+          'life': 100,
+          'shield': 1200,
+          'speed': 400,
+          'capacity': 3000
         }
       }
     )
