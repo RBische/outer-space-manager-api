@@ -116,6 +116,15 @@ var user = {
               usersReturned.push(usersFetched[key])
             }
           }
+          usersReturned.sort(function compare (a, b) {
+            if (a.points > b.points) {
+              return -1
+            }
+            if (a.points < b.points) {
+              return 1
+            }
+            return 0
+          })
           res.json({
             size: usersFetched.length,
             users: usersReturned
