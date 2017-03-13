@@ -106,6 +106,7 @@ var seed = {
     refSearches.update(
       {
         0: {
+          'searchId': 0,
           'name': 'Recherche robotique',
           'effect': 'speed_building',
           'amountOfEffectByLevel': 30,
@@ -118,6 +119,7 @@ var seed = {
           'gasCostLevel0': 100
         },
         1: {
+          'searchId': 1,
           'name': 'Recherche moteurs',
           'effect': 'speed_fleet',
           'amountOfEffectByLevel': 100,
