@@ -183,6 +183,8 @@ const fleet = {
    * @apiGroup Fleet
    * @apiVersion 1.0.0
    *
+   * @apiHeader {String} x-access-token The access token of the user
+   *
    * @apiParam {Integer} shipId The ship id that the player wants to create
    * @apiParam {Integer} amount The amount of this ship that will be created
    *
