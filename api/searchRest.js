@@ -84,9 +84,9 @@ var search = {
               var currentSearch = searches.searches[keySearch]
               console.log('Current search: ' + JSON.stringify(currentSearch))
               if (searches.userSearches && searches.userSearches[currentSearch.searchId]) {
-                currentSearch = Object.assign({level: searches.userSearches[currentSearch.searchId].level}, currentSearch)
+                currentSearch = Object.assign({level: searches.userSearches[currentSearch.searchId].level, building: searches.userSearches[currentSearch.searchId].building}, currentSearch)
               } else {
-                currentSearch = Object.assign({level: 0}, currentSearch)
+                currentSearch = Object.assign({level: 0, building: false}, currentSearch)
               }
               searchesRet.push(currentSearch)
             }
