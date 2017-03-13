@@ -96,6 +96,7 @@ router.get('/api/v1/ships', fleetRest.getShips)
 router.get('/api/v1/fleet/list', fleetRest.getShipsForUser)
 router.post('/api/v1/ships/create/:shipId', fleetRest.createShip)
 router.get('/api/v1/users/:from/:limit', userRest.getUsers)
+router.get('/api/v1/reports/:from/:limit', userRest.getReports)
 router.post('/api/v1/fleet/attack/:userName', fleetRest.attack)
 router.get('/api/v1/users/get', userRest.getCurrentUser)
 

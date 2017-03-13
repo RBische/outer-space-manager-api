@@ -273,22 +273,28 @@ function handleAttack (currentItem, keys, items, callback) {
               // TODO: add in report the informations for the attacked user minerals
               return ref.child('users/' + messageObject.toUser + '/reports').push({type: 'attacked',
                 date: currentItem.executionTime,
+                dateInv: 2147483648 * 1000 - currentItem.executionTime,
                 defenderFleet: defenderFleet,
                 attackerFleet: messageObject.fleet,
                 defenderFleetAfterBattle: defenderFleetAfterBattle,
                 attackerFleetAfterBattle: attackerFleetAfterBattle,
                 mineralsWon: mineralsWon,
-                gasWon: gasWon
+                gasWon: gasWon,
+                from: messageObject.fromUser,
+                to: messageObject.toUser
               })
               .then(function (res) {
                 return ref.child('users/' + messageObject.fromUser + '/reports').push({type: 'attacker',
                   date: currentItem.executionTime,
+                  dateInv: 2147483648 * 1000 - currentItem.executionTime,
                   defenderFleet: defenderFleet,
                   attackerFleet: messageObject.fleet,
                   defenderFleetAfterBattle: defenderFleetAfterBattle,
                   attackerFleetAfterBattle: attackerFleetAfterBattle,
                   mineralsWon: mineralsWon,
-                  gasWon: gasWon
+                  gasWon: gasWon,
+                  from: messageObject.fromUser,
+                  to: messageObject.toUser
                 })
               })
             })

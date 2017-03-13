@@ -138,6 +138,120 @@ var user = {
     }
   },
   /**
+   * @api {get} /api/vXXX/reports/:from/:limit Get reports
+   * @apiDescription Get attack reports order by timestamp desc
+   * @apiName GetReports
+   * @apiGroup User
+   * @apiVersion 1.0.0
+   *
+   * @apiHeader {String} x-access-token The access token of the user
+   *
+   * @apiExample {curl} Example usage:
+   *     curl -X GET -H "x-access-token: $token$" "https://outer-space-manager.herokuapp.com/api/v1/reports/0/3"
+   * @apiSuccessExample {json} Success
+   *HTTP/1.1 200 OK
+   *{
+  "reports": [
+    {
+      "attackerFleet": [
+        {
+          "amount": 1,
+          "shipId": 0
+        }
+      ],
+      "attackerFleetAfterBattle": {
+        "capacity": 30,
+        "fleet": [
+          {
+            "amount": 1
+          }
+        ],
+        "survivingShips": 1
+      },
+      "date": 1489431003060,
+      "dateInv": 658052644940,
+      "defenderFleet": [
+        {
+          "amount": 1,
+          "gasCost": 100,
+          "life": 60,
+          "maxAttack": 60,
+          "minAttack": 40,
+          "mineralCost": 300,
+          "name": "Chasseur léger",
+          "shield": 15,
+          "shipId": 0,
+          "spatioportLevelNeeded": 0,
+          "speed": 1000,
+          "timeToBuild": 30
+        }
+      ],
+      "defenderFleetAfterBattle": {
+        "capacity": 0,
+        "fleet": [
+          {
+            "amount": 0
+          }
+        ],
+        "survivingShips": 0
+      },
+      "from": "alan",
+      "gasWon": 10,
+      "mineralsWon": 20,
+      "to": "alansearch",
+      "type": "attacked"
+    }
+  ]
+}
+   * @apiError invalid_request Missing limit or from param or not valid value in these params (401)
+   * @apiError invalid_access_token The token supplied is not valid (403)
+   */
+  getReports: function (req, res, next) {
+    if (req.params.from !== undefined && req.params.limit !== undefined && req.params.limit > 0 && req.params.from >= 0 && req.params.limit <= 20) {
+      const limit = req.params.limit
+      console.log('Fetching reports from ' + req.params.from + ' with limit ' + limit)
+      const ref = 'outer-space-manager/users/' + req.user.username + '/reports'
+      console.log(ref)
+      var reportsRef = db.ref(ref)
+        .orderByChild('dateInv')
+        .startAt(parseInt(req.params.from))
+        .limitToFirst(parseInt(limit))
+      reportsRef.once('value', function (snapshot) {
+        console.log('Successfully fetched reports')
+        var reportsFetched = snapshot.val()
+        console.log('Reports: ' + JSON.stringify(reportsFetched))
+        var reportsReturned = []
+        if (!reportsFetched) {
+          res.json({
+            size: 0,
+            reports: []
+          })
+        } else {
+          for (var key in reportsFetched) {
+            reportsReturned.push(reportsFetched[key])
+          }
+          reportsReturned.sort(function compare (a, b) {
+            if (a.dateInv > b.dateInv) {
+              return -1
+            }
+            if (a.dateInv < b.dateInv) {
+              return 1
+            }
+            return 0
+          })
+          res.json({
+            size: reportsFetched.length,
+            reports: reportsReturned
+          })
+        }
+      }, function (errorObject) {
+        console.log('Error fetching reports : ' + errorObject)
+      })
+    } else {
+      res.respond('Invalid request, no from or limit given, or limit <= 0', 'invalid_request', 401)
+    }
+  },
+  /**
    * @api {get} /api/vXXX/users/get Get current user
    * @apiDescription Get the current user and his informations
    * @apiName GetUser
