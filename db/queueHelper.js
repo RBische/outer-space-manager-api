@@ -137,14 +137,18 @@ function executeItems (keys, items, callback) {
                       var effect = {}
                       effect[currentItem.object.effectAdded] = userToModify[currentItem.object.effectAdded] + currentItem.object.amountOfEffectByLevel
                       console.log(JSON.stringify(effect))
-                      ref.child('users/' + currentItem.username).update(effect, function (error) {
-                        if (error) {
-                          console.log('Effect not added to user : ' + error)
-                        } else {
-                          console.log('Effect successfully added')
-                        }
+                      if (effect[currentItem.object.effectAdded]) {
+                        ref.child('users/' + currentItem.username).update(effect, function (error) {
+                          if (error) {
+                            console.log('Effect not added to user : ' + error)
+                          } else {
+                            console.log('Effect successfully added')
+                          }
+                          executeItems(keys, items, callback)
+                        })
+                      } else {
                         executeItems(keys, items, callback)
-                      })
+                      }
                     } else {
                       executeItems(keys, items, callback())
                     }
