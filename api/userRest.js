@@ -231,10 +231,10 @@ var user = {
             reportsReturned.push(reportsFetched[key])
           }
           reportsReturned.sort(function compare (a, b) {
-            if (a.dateInv > b.dateInv) {
+            if (a.dateInv < b.dateInv) {
               return -1
             }
-            if (a.dateInv < b.dateInv) {
+            if (a.dateInv > b.dateInv) {
               return 1
             }
             return 0
