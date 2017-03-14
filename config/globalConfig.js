@@ -33,7 +33,7 @@ globalConfig.calculateExecutionTimeForShip = function (speedCreation, amount, ti
   var executionTime = timeToBuild * amount * 1000
   if (speedCreation !== undefined) {
     console.log('Reduced time by ' + (1 - (1 / (speedCreation || 1))) * 100 + ' %')
-    executionTime = executionTime * (1 / (speedCreation || 1))
+    executionTime = executionTime * (1 / ((speedCreation / 25) || 1))
   }
   return executionTime + Date.now()
 }

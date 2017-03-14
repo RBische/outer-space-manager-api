@@ -65,6 +65,7 @@ function executeItems (keys, items, callback) {
   if (keys.length > 0) {
     var currentKey = keys.shift()
     var currentItem = items[currentKey]
+    console.log('Trying to executeItems')
     if (currentItem.executionTime <= Date.now()) {
       console.log('Executing item : ' + currentItem.executionTime)
       var afterModifying = function () {
