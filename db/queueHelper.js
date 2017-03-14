@@ -251,12 +251,15 @@ function handleAttack (currentItem, keys, items, callback) {
                 const totalCapacity = attackerFleetAfterBattle.capacity
                 const defenderMinerals = res.attackedUser.minerals
                 const defenderGas = res.attackedUser.gas
+                console.log('User minerals : ' + defenderMinerals + ' user gas : ' + defenderGas)
                 var mineralsAfter = 0
                 var gasAfter = 0
                 if ((defenderGas * 1) / 3 + (defenderMinerals * 1) / 3 > totalCapacity) {
+                  console.log('Capacity too low')
                   mineralsWon = (totalCapacity * 2) / 3
                   gasWon = (totalCapacity * 1) / 3
                 } else {
+                  console.log('Capacity too high')
                   mineralsWon = (defenderMinerals * 1) / 3
                   gasWon = (defenderGas * 1) / 3
                 }
@@ -265,7 +268,7 @@ function handleAttack (currentItem, keys, items, callback) {
                 console.log('Minerals won : ' + mineralsWon + ' Gas won : ' + gasWon)
                 return ref.child('users/' + messageObject.toUser).update({minerals: mineralsAfter, gas: gasAfter})
                   .then(function (fbRes) {
-                    return ref.child('users/' + messageObject.fromUser).update({minerals: mineralsWon + res.attacker.minerals, gas: gasAfter + res.attacker.gas})
+                    return ref.child('users/' + messageObject.fromUser).update({minerals: mineralsWon + res.attacker.minerals, gas: gasWon + res.attacker.gas})
                   })
               }
             })
