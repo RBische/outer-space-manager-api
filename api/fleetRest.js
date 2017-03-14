@@ -21,6 +21,8 @@ const fleet = {
    * @apiSuccessExample {json} Success
    *HTTP/1.1 200 OK
    *{
+  "currentUserMinerals": 330.7304000000001,
+  "currentUserGas": 319.2065,
   "size": 2,
   "ships": [
     {
@@ -67,6 +69,8 @@ const fleet = {
       }
       if (shipsFetched) {
         res.json({
+          currentUserMinerals: req.user.minerals,
+          currentUserGas: req.user.gas,
           size: shipsFetched.length,
           ships: shipsFetched
         })
