@@ -205,37 +205,26 @@ const fleet = {
   },
   constructShips: function (response, user, shipId, amount) {
     // TODO: Add control on spatioport level
-    return ref.child('users/' + user.username + '/fleet/' + shipId)
-      .once('value')
-      .then(function (res) {
-        if (!res.val()) {
-          return ref.child('ships/' + shipId)
-            .once('value')
-            .then(function (res) {
-              if (!res.val()) {
-                response.respond('No ships found', 'no_ships_found', 404)
-                return Promise.reject({code: 'no_ships_found', info: shipId})
-              } else {
-                return res.val()
-              }
-            }, function (error) {
-              console.error(error)
-              response.respond('Error in server side', 'internal_error', 500)
-              return Promise.reject({code: 'InternalError', info: error})
-            })
-        } else {
-          return res.val()
-        }
-      }, function (error) {
-        console.error(error)
-        response.respond('Error in server side', 'internal_error', 500)
-        return Promise.reject({code: 'InternalError', info: error})
-      })
+    return ref.child('ships/' + shipId)
+        .once('value')
+        .then(function (res) {
+          if (!res.val()) {
+            response.respond('No ships found', 'no_ships_found', 404)
+            return Promise.reject({code: 'no_ships_found', info: shipId})
+          } else {
+            return res.val()
+          }
+        }, function (error) {
+          console.error(error)
+          response.respond('Error in server side', 'internal_error', 500)
+          return Promise.reject({code: 'InternalError', info: error})
+        })
       .then(function (ship) {
         var futureSupposedAmount = amount
         if (ship.amount) {
           futureSupposedAmount = amount + futureSupposedAmount
         }
+        console.log(JSON.stringify(ship))
         console.log('Future supposed amount: ' + futureSupposedAmount)
         var mineralCost = ship.mineralCost * amount
         var gasCost = ship.gasCost * amount
