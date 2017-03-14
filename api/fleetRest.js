@@ -109,9 +109,15 @@ const fleet = {
         console.log('Successfully fetched fleet for user')
         var shipsFetched = snapshot.val()
         if (shipsFetched) {
+          var shipsReturned = []
+          for (var key in shipsFetched) {
+            if (shipsFetched.hasOwnProperty(key)) {
+              shipsReturned.push(shipsFetched[key])
+            }
+          }
           res.json({
-            size: shipsFetched.length,
-            ships: shipsFetched
+            size: shipsReturned.length,
+            ships: shipsReturned
           })
         } else {
           res.json({
