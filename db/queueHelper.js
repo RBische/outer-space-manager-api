@@ -9,7 +9,7 @@ var queue = {
       objectType: objectType,
       object: object,
       key: key,
-      executionTime: executionTime,
+      executionTime: parseInt(executionTime),
       username: username,
       points: points,
       amount: amount || 0
