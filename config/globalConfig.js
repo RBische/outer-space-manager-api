@@ -30,12 +30,12 @@ globalConfig.calculateExecutionTimeForSearch = function (speedSearch, level, tim
 }
 
 globalConfig.calculateExecutionTimeForShip = function (speedCreation, amount, timeToBuild, searchId) {
-  var executionTime = timeToBuild * amount * 1000 + Date.now()
+  var executionTime = timeToBuild * amount * 1000
   if (speedCreation !== undefined) {
     console.log('Reduced time by ' + (1 - (1 / (speedCreation || 1))) * 100 + ' %')
     executionTime = executionTime * (1 / (speedCreation || 1))
   }
-  return executionTime
+  return executionTime + Date.now()
 }
 
 globalConfig.calculatePointsForUser = function (minerals, gas) {
