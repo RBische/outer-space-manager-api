@@ -47,7 +47,7 @@ globalConfig.calculatePointsWithFleetForUser = function (minerals, gas) {
 }
 
 globalConfig.getDistanceFromUsers = function (user1, user2) {
-  return Math.abs(user1.points - user2.points) * 2000
+  return Math.abs(user1.points - user2.points) * 15000
 }
 
 module.exports = globalConfig

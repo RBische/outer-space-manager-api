@@ -117,7 +117,7 @@ var seed = {
           'shipId': 4,
           'name': 'Etoile de la mort',
           'spatioportLevelNeeded': 6,
-          'timeToBuild': 10,
+          'timeToBuild': 500,
           'mineralCost': 5000,
           'gasCost': 5000,
           'minAttack': 1400,
