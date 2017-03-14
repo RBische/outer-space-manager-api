@@ -251,7 +251,7 @@ const fleet = {
             function () {
               response.json({code: 'ok'})
               resolve()
-            }, amount
+            }, parseInt(amount)
           )
         })
       })

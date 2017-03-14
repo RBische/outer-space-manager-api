@@ -116,6 +116,7 @@ function executeItems (keys, items, callback) {
                         }
                         console.log('Amount after :' + amount)
                         ship.amount = amount
+                        ship.shipId = currentItem.object.shipId
                         return ship
                       } else {
                         const ret = Object.assign(currentItem.object, {amount: currentItem.amount})
