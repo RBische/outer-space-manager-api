@@ -282,8 +282,9 @@ const fleet = {
    * @apiSuccessExample {json} Success
    *     HTTP/1.1 200 OK
    *     {
-   *       internalCode: "ok"
-   *     }
+  "code": "ok",
+  "attackTime": 1489922421577
+}
    * @apiError invalid_request Missing ships or username (401)
    * @apiError not_enough_ships Not enough resources to build these ships (401)
    * @apiError no_ships_found This ship does not exist (404)
@@ -341,7 +342,7 @@ const fleet = {
                 }
                 return ref.child('users/' + req.user.username + '/fleet/').set(userFleet)
                 .then(function (result) {
-                  res.json({code: 'ok'})
+                  res.json({code: 'ok', attackTime: executionTime})
                   userMakingRequest.splice(userMakingRequest.indexOf(req.user.username), 1)
                   resolve()
                 })
