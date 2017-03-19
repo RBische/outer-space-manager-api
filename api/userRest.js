@@ -93,8 +93,7 @@ var user = {
       console.log('Fetching users from ' + req.params.from + ' with limit ' + limit)
       var usersRef = ref.child('users')
         .orderByChild('pointsInv')
-        .startAt(parseInt(req.params.from))
-        .limitToFirst(parseInt(limit))
+        .limitToFirst(parseInt(limit) + parseInt(req.params.from) + 1)
       usersRef.once('value', function (snapshot) {
         console.log('Successfully fetched users')
         var usersFetched = snapshot.val()
@@ -107,16 +106,20 @@ var user = {
         } else {
           const allowedKeys = ['username', 'points']
           for (var key in usersFetched) {
-            if (usersFetched.hasOwnProperty(key)) {
+            if (usersFetched.hasOwnProperty(key) && usersFetched[key].hasOwnProperty('username')) {
               for (var subkey in usersFetched[key]) {
                 if (!allowedKeys.includes(subkey)) {
                   delete usersFetched[key][subkey]
                 }
               }
-              usersReturned.push(usersFetched[key])
+              if (usersFetched[key]) {
+                console.log(usersFetched[key])
+                usersReturned.push(usersFetched[key])
+              }
             }
           }
-          usersReturned.sort(function compare (a, b) {
+          console.log(JSON.stringify(usersReturned))
+          const result = usersReturned.sort(function compare (a, b) {
             if (a.points > b.points) {
               return -1
             }
@@ -125,9 +128,11 @@ var user = {
             }
             return 0
           })
+          console.log(JSON.stringify(result))
+          const usersPaginated = result.slice(req.params.from, result.length)
           res.json({
-            size: usersFetched.length,
-            users: usersReturned
+            size: usersPaginated.length,
+            users: usersPaginated
           })
         }
       }, function (errorObject) {
@@ -214,8 +219,7 @@ var user = {
       console.log(ref)
       var reportsRef = db.ref(ref)
         .orderByChild('dateInv')
-        .startAt(parseInt(req.params.from))
-        .limitToFirst(parseInt(limit))
+        .limitToFirst(parseInt(limit) + parseInt(req.params.from) + 1)
       reportsRef.once('value', function (snapshot) {
         console.log('Successfully fetched reports')
         var reportsFetched = snapshot.val()
@@ -230,7 +234,7 @@ var user = {
           for (var key in reportsFetched) {
             reportsReturned.push(reportsFetched[key])
           }
-          reportsReturned.sort(function compare (a, b) {
+          const result = reportsReturned.sort(function compare (a, b) {
             if (a.dateInv < b.dateInv) {
               return -1
             }
@@ -239,9 +243,10 @@ var user = {
             }
             return 0
           })
+          const reportsPaginated = result.slice(req.params.from, result.length)
           res.json({
-            size: reportsFetched.length,
-            reports: reportsReturned
+            size: reportsPaginated.length,
+            reports: reportsPaginated
           })
         }
       }, function (errorObject) {
