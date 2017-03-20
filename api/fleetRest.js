@@ -6,6 +6,7 @@ const ref = db.ref('outer-space-manager')
 const globalConfig = require('../config/globalConfig')
 const userRest = require('../api/userRest')
 var userMakingRequest = []
+var userMakingCreateRequest = []
 const fleet = {
   /**
    * @api {get} /api/vXXX/ships/:shipId Get ship
@@ -257,10 +258,12 @@ const fleet = {
    */
   createShip: function (req, res, next) {
     console.log('Creating ship' + JSON.stringify(req.params))
-    if (req.params.shipId !== undefined && req.body.amount !== undefined) {
+    if (req.params.shipId !== undefined && req.body.amount !== undefined && !userMakingCreateRequest.includes(req.user.username)) {
+      userMakingCreateRequest.push(req.user.username)
       var user = req.user
       fleet.constructShips(res, user, req.params.shipId, req.body.amount)
       .catch(function (rejection) {
+        userMakingCreateRequest.splice(userMakingCreateRequest.indexOf(req.user.username), 1)
         console.log(rejection)
       })
     } else {
@@ -314,6 +317,7 @@ const fleet = {
         return new Promise(function (resolve, reject) {
           queueHelper.addToQueue('ships', info.ship, 'users/' + user.username + '/fleet/' + shipId, info.executionTime, info.points, user.username,
             function () {
+              userMakingCreateRequest.splice(userMakingCreateRequest.indexOf(user), 1)
               response.json({code: 'ok'})
               resolve()
             }, parseInt(amount)
