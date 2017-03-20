@@ -90,14 +90,14 @@ var seed = {
           'name': 'Sonde d\'espionnage',
           'spatioportLevelNeeded': 0,
           'timeToBuild': 10,
-          'mineralCost': 10,
-          'gasCost': 5,
+          'mineralCost': 20,
+          'gasCost': 10,
           'minAttack': 1,
           'maxAttack': 1,
           'life': 1,
-          'shield': 1,
+          'shield': 0,
           'speed': 150000,
-          'capacity': 2
+          'capacity': 0
         },
         3: {
           'shipId': 3,
