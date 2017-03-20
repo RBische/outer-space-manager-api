@@ -277,11 +277,11 @@ const fleet = {
    * @apiParam {Integer} userName The user to attack
    * @apiParam {Object[]} ships The ships used for the attack
    * @apiParam {Integer} ships.shipId ShipId used for the attack
-   * @apiParam {Integer} ships.amout Amount of this ship used for the attack
+   * @apiParam {Integer} ships.amount Amount of this ship used for the attack
    *
    * @apiSuccessExample {json} Success
-   *     HTTP/1.1 200 OK
-   *     {
+   *HTTP/1.1 200 OK
+   *{
   "code": "ok",
   "attackTime": 1489922421577
 }
