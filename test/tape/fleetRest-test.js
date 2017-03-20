@@ -23,6 +23,33 @@ test('GET /api/v1/ships', function (assert) {
   })
 })
 
+test('GET /api/v1/ships/:shipId', function (assert) {
+  request(app)
+  .get('/api/v1/ships/0')
+  .set('x-access-token', token.token)
+  .expect(200)
+  .end(function (err, res) {
+    console.log(JSON.stringify(err))
+    assert.true(err === null)
+    var result = res.body
+    console.log(JSON.stringify(result))
+    assert.true(result.shipId === 0, 'The list does not contains ships')
+    assert.end()
+  })
+})
+
+test('GET /api/v1/ships/:shipId without sheep id', function (assert) {
+  request(app)
+  .get('/api/v1/ships/999999')
+  .set('x-access-token', token.token)
+  .expect(404)
+  .end(function (err, res) {
+    console.log(JSON.stringify(err))
+    assert.true(err === null)
+    assert.end()
+  })
+})
+
 test('POST /api/v1/ships/create/:shipId', function (assert) {
   require('../../api/userRest')
   .changeResources('alan', 300, 100)

@@ -8,6 +8,61 @@ const userRest = require('../api/userRest')
 var userMakingRequest = []
 const fleet = {
   /**
+   * @api {get} /api/vXXX/ships/:shipId Get ship
+   * @apiDescription Get a ship with his id
+   * @apiName GetShip
+   * @apiGroup Fleet
+   * @apiVersion 1.0.0
+   *
+   * @apiHeader {String} x-access-token The access token of the user
+   *
+   * @apiExample {curl} Example usage:
+   *     curl -X GET -H "x-access-token: $token$" "https://outer-space-manager.herokuapp.com/api/v1/ships/0"
+   * @apiSuccessExample {json} Success
+   *HTTP/1.1 200 OK
+   *{
+      "gasCost": 100,
+      "life": 60,
+      "maxAttack": 60,
+      "minAttack": 40,
+      "mineralCost": 300,
+      "name": "Chasseur léger",
+      "shipId": 0,
+      "shield": 15,
+      "spatioportLevelNeeded": 0,
+      "speed": 1000,
+      "timeToBuild": 30
+    }
+   * @apiError no_ships_found No ships were found (404)
+   * @apiError invalid_access_token The token supplied is not valid (403)
+   * @apiError server_bad_response The server did not handle the request correctly (500)
+   */
+  getShipById: function (req, res) {
+    if (req.params.shipId === undefined) {
+      res.respond('Invalid request, no shipId or no amount given', 'invalid_request', 401)
+      return
+    }
+    var shipsRef = ref.child('ships')
+    shipsRef.once('value', function (snapshot) {
+      console.log('Successfully fetched ships')
+      var shipsFetched = snapshot.val()
+
+      if (!shipsFetched) {
+        res.respond('No ships found', 'no_ships_found', 404)
+        return
+      }
+      if (shipsFetched) {
+        if (shipsFetched.hasOwnProperty(req.params.shipId)) {
+          res.json(shipsFetched[req.params.shipId])
+        } else {
+          res.respond('No ships found', 'no_ships_found', 404)
+        }
+      }
+    }, function (errorObject) {
+      console.log('Error fetching ships : ' + errorObject)
+    })
+  },
+  /**
    * @api {get} /api/vXXX/ships Get ships
    * @apiDescription Get the list of available ships
    * @apiName GetShips

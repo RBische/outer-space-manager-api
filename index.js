@@ -92,6 +92,7 @@ router.post('/api/v1/buildings/create/:buildingId', buildings.createBuildingForU
 router.get('/api/v1/searches', searches.getSearches)
 router.get('/api/v1/searches/list', searches.getSearchesForUser)
 router.post('/api/v1/searches/create/:searchId', searches.createSearchForUser)
+router.get('/api/v1/ships/:shipId', fleetRest.getShipById)
 router.get('/api/v1/ships', fleetRest.getShips)
 router.get('/api/v1/fleet/list', fleetRest.getShipsForUser)
 router.post('/api/v1/ships/create/:shipId', fleetRest.createShip)
