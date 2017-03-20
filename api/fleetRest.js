@@ -346,6 +346,10 @@ const fleet = {
    * @apiError internal_error Something went wrong, try again later (500)
    */
   attack: function (req, res, next) {
+    if (req.params.userName === req.user.username) {
+      res.respond('Seriously, you are really trying to attack yourself ?', 'invalid_request', 401)
+      return
+    }
     if (req.params.userName !== undefined && req.body.ships !== undefined && req.body.ships.length > 0 && !userMakingRequest.includes(req.user.username)) {
       userMakingRequest.push(req.user.username)
       const attackFleet = []
