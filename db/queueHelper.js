@@ -324,7 +324,7 @@ function getFleetAfterFight (damageTaken, fleet, ships) {
     const shipsSurviving = Math.max(Math.round(((fleet[i].amount * lifeForShip) - damagePerShips) / lifeForShip), 0)
     console.log('Must stay ' + shipsSurviving + ' ships after battle')
     console.log('Was :' + fleet[i].amount + ' and now: ' + shipsSurviving)
-    fleetSurviving[fleet[i].shipId] = {amount: shipsSurviving}
+    fleetSurviving[fleet[i].shipId] = Object.assign({amount: shipsSurviving}, ships[fleet[i].shipId])
     totalCapacity += ships[fleet[i].shipId].capacity * shipsSurviving
     survivingShips += shipsSurviving
   }
