@@ -278,26 +278,34 @@ function handleAttack (currentItem, keys, items, callback) {
             .then(function (fbRes) {
               console.log('Creating reports')
               // TODO: add in report the informations for the attacked user minerals
+              const defenderFleetAfterBattleFormatted = defenderFleetAfterBattle
+              defenderFleetAfterBattleFormatted.fleet = formatToTable(defenderFleetAfterBattle.fleet)
+              const attackerFleetAfterBattleFormatted = attackerFleetAfterBattle
+              attackerFleetAfterBattleFormatted.fleet = formatToTable(attackerFleetAfterBattle.fleet)
               return ref.child('users/' + messageObject.toUser + '/reports').push({type: 'attacked',
                 date: currentItem.executionTime,
                 dateInv: 2147483648 * 1000 - currentItem.executionTime,
                 defenderFleet: defenderFleet,
                 attackerFleet: messageObject.fleet,
-                defenderFleetAfterBattle: formatToTable(defenderFleetAfterBattle),
-                attackerFleetAfterBattle: formatToTable(attackerFleetAfterBattle),
+                defenderFleetAfterBattle: defenderFleetAfterBattleFormatted,
+                attackerFleetAfterBattle: attackerFleetAfterBattleFormatted,
                 mineralsWon: mineralsWon,
                 gasWon: gasWon,
                 from: messageObject.fromUser,
                 to: messageObject.toUser
               })
               .then(function (res) {
+                const defenderFleetAfterBattleFormatted = defenderFleetAfterBattle
+                defenderFleetAfterBattleFormatted.fleet = formatToTable(defenderFleetAfterBattle.fleet)
+                const attackerFleetAfterBattleFormatted = attackerFleetAfterBattle
+                attackerFleetAfterBattleFormatted.fleet = formatToTable(attackerFleetAfterBattle.fleet)
                 return ref.child('users/' + messageObject.fromUser + '/reports').push({type: 'attacker',
                   date: currentItem.executionTime,
                   dateInv: 2147483648 * 1000 - currentItem.executionTime,
                   defenderFleet: defenderFleet,
                   attackerFleet: messageObject.fleet,
-                  defenderFleetAfterBattle: formatToTable(defenderFleetAfterBattle),
-                  attackerFleetAfterBattle: formatToTable(attackerFleetAfterBattle),
+                  defenderFleetAfterBattle: defenderFleetAfterBattle,
+                  attackerFleetAfterBattle: attackerFleetAfterBattle,
                   mineralsWon: mineralsWon,
                   gasWon: gasWon,
                   from: messageObject.fromUser,
