@@ -283,8 +283,8 @@ function handleAttack (currentItem, keys, items, callback) {
                 dateInv: 2147483648 * 1000 - currentItem.executionTime,
                 defenderFleet: defenderFleet,
                 attackerFleet: messageObject.fleet,
-                defenderFleetAfterBattle: defenderFleetAfterBattle,
-                attackerFleetAfterBattle: attackerFleetAfterBattle,
+                defenderFleetAfterBattle: formatToTable(defenderFleetAfterBattle),
+                attackerFleetAfterBattle: formatToTable(attackerFleetAfterBattle),
                 mineralsWon: mineralsWon,
                 gasWon: gasWon,
                 from: messageObject.fromUser,
@@ -296,8 +296,8 @@ function handleAttack (currentItem, keys, items, callback) {
                   dateInv: 2147483648 * 1000 - currentItem.executionTime,
                   defenderFleet: defenderFleet,
                   attackerFleet: messageObject.fleet,
-                  defenderFleetAfterBattle: defenderFleetAfterBattle,
-                  attackerFleetAfterBattle: attackerFleetAfterBattle,
+                  defenderFleetAfterBattle: formatToTable(defenderFleetAfterBattle),
+                  attackerFleetAfterBattle: formatToTable(attackerFleetAfterBattle),
                   mineralsWon: mineralsWon,
                   gasWon: gasWon,
                   from: messageObject.fromUser,
@@ -355,6 +355,14 @@ function calculateShieldPoints (fleet, ships) {
 
 function getRandomArbitrary (min, max) {
   return Math.random() * (max - min) + min
+}
+
+function formatToTable (fleet) {
+  var futureTable = []
+  for (var key in fleet) {
+    futureTable.push(fleet[key])
+  }
+  return futureTable
 }
 
 module.exports = queue
