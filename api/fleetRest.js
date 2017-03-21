@@ -307,14 +307,16 @@ const fleet = {
         console.log('Current minerals : ' + user.minerals + ' And after : ' + (user.minerals - mineralCost))
         console.log('Current gas : ' + user.gas + ' And after : ' + (user.gas - gasCost))
         if (userRest.hasSufficientResources(user.minerals, user.gas, mineralCost, gasCost)) {
-          userRest.changeResources(user.username, -mineralCost, -gasCost)
-          const points = globalConfig.calculatePointsWithFleetForUser(mineralCost, gasCost)
-          console.log('Minerals transaction done')
-          const speedFromBuildings = user['speed_fleet'] ? user['speed_fleet'] : 0
-          const speedFromSearch = user['speed_fleet_from_search'] ? user['speed_fleet_from_search'] : 0
-          const executionTime = globalConfig.calculateExecutionTimeForShip(speedFromBuildings + speedFromSearch, amount, ship.timeToBuild, shipId)
-          console.log('Building will be ok at : ' + executionTime + ' It is now : ' + Date.now() + ' with ttb: ' + (executionTime - Date.now()))
-          return {points: points, executionTime: executionTime, ship: ship, amount: amount}
+          return userRest.changeResources(user.username, -mineralCost, -gasCost)
+            .then(function (res) {
+              const points = globalConfig.calculatePointsWithFleetForUser(mineralCost, gasCost)
+              console.log('Minerals transaction done')
+              const speedFromBuildings = user['speed_fleet'] ? user['speed_fleet'] : 0
+              const speedFromSearch = user['speed_fleet_from_search'] ? user['speed_fleet_from_search'] : 0
+              const executionTime = globalConfig.calculateExecutionTimeForShip(speedFromBuildings + speedFromSearch, amount, ship.timeToBuild, shipId)
+              console.log('Building will be ok at : ' + executionTime + ' It is now : ' + Date.now() + ' with ttb: ' + (executionTime - Date.now()))
+              return {points: points, executionTime: executionTime, ship: ship, amount: amount}
+            })
         } else {
           response.respond('Not enough resources', 'not_enough_resources', 401)
           return Promise.reject({code: 'not_enough_resources'})
