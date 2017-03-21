@@ -258,14 +258,21 @@ const fleet = {
    */
   createShip: function (req, res, next) {
     console.log('Creating ship' + JSON.stringify(req.params))
-    if (req.params.shipId !== undefined && req.body.amount !== undefined && !userMakingCreateRequest.includes(req.user.username)) {
-      userMakingCreateRequest.push(req.user.username)
-      var user = req.user
-      fleet.constructShips(res, user, req.params.shipId, req.body.amount)
-      .catch(function (rejection) {
-        userMakingCreateRequest.splice(userMakingCreateRequest.indexOf(req.user.username), 1)
-        console.log(rejection)
-      })
+    if (req.params.shipId !== undefined && req.body.amount !== undefined) {
+      console.log(JSON.stringify(userMakingCreateRequest))
+      if (!userMakingCreateRequest.includes(req.user.username)) {
+        console.log('Going through')
+        userMakingCreateRequest.push(req.user.username)
+        var user = req.user
+        fleet.constructShips(res, user, req.params.shipId, req.body.amount)
+        .catch(function (rejection) {
+          userMakingCreateRequest.splice(userMakingCreateRequest.indexOf(req.user.username), 1)
+          console.log(rejection)
+        })
+      } else {
+        res.respond('Spamming is not a solution', 'invalid_request', 401)
+        return
+      }
     } else {
       res.respond('Invalid request, no shipId or no amount given', 'invalid_request', 401)
       return
