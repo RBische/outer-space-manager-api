@@ -3,6 +3,7 @@ var db = admin.database()
 var queueRef = db.ref('outer-space-manager/queue')
 var ref = db.ref('outer-space-manager')
 var running = false
+var timeRunning = 0
 var queue = {
   addToQueue: function (objectType, object, key, executionTime, points, username, callback, amount) {
     const objectToSave = {
@@ -37,7 +38,8 @@ var queue = {
     })
   },
   executeQueue: function (callback) {
-    if (!running) {
+    if (!running || timeRunning + 50000 < Date.now()) {
+      timeRunning = Date.now()
       running = true
       queueRef.orderByKey().once('value', function (snapshot) {
         var queueItems = snapshot.val()
