@@ -282,7 +282,7 @@ var user = {
    */
   getCurrentUser: function (req, res, next) {
     const user = req.user
-    const allowedKeys = ['username', 'points', 'gas', 'gasModifier', 'minerals', 'mineralsModifier', 'reports', 'username']
+    const allowedKeys = ['username', 'points', 'gas', 'gasModifier', 'minerals', 'mineralsModifier', 'username']
     for (var key in user) {
       if (user.hasOwnProperty(key)) {
         if (!allowedKeys.includes(key)) {
