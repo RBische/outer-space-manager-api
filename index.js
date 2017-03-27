@@ -102,6 +102,7 @@ router.get('/api/v1/reports/:from/:limit', userRest.getReports)
 router.post('/api/v1/fleet/attack/:userName', fleetRest.attack)
 router.get('/api/v1/users/get', userRest.getCurrentUser)
 router.post('/api/v1/devices/add', deviceRest.addDeviceToken)
+router.post('/api/v1/devices/pushme', deviceRest.pushme)
 
 app.use('/', router)
 if (module.parent === null) {
