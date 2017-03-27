@@ -45,6 +45,7 @@
   "dependencies": {
     "apidoc": "^0.17.5",
     "body-parser": "^1.15.2",
+    "email-validator": "^1.0.7",
     "firebase-admin": "^4.0.4",
     "jsonwebtoken": "^7.2.1"
   }

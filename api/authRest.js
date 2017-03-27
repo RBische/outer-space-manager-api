@@ -12,6 +12,7 @@ var auth = {
    * @apiGroup User
    * @apiVersion 1.0.0
    *
+   * @apiParam {String} email The email of the user
    * @apiParam {String} username The username of the player
    * @apiParam {String} password The password of the player
    *
@@ -24,12 +25,14 @@ var auth = {
    * @apiError invalid_request Missing username or password (401)
    * @apiError invalid_credentials Must not happen but the create uses the login flow (401)
    * @apiError already_registered_username Already registered username (400)
+   * @apiError already_registered_email Already registered email (400)
    */
   create: function (req, res) {
     var username = req.body.username || ''
     var password = req.body.password || ''
+    var email = req.body.email || ''
 
-    if (username === '' || password === '') {
+    if (username === '' || password === '' || email === '') {
       res.respond('Invalid request', 'invalid_request', 401)
       return
     }
@@ -40,42 +43,57 @@ var auth = {
       res.respond('Invalid request, username must not contains special chars', 'invalid_request', 401)
       return
     }
+    var validator = require('email-validator')
+
+    if (!validator.validate(email)) {
+      console.log('Special chars for email')
+      res.respond('Invalid request, email is not valid', 'invalid_request', 401)
+      return
+    }
 
     var usersRef = ref.child('users')
     var crypto = require('crypto')
     var hash = crypto.createHash('sha256').update(password).digest('base64')
+    usersRef.orderByChild('email').equalTo(email).once('value')
+      .then(function (response) {
+        var responseFetched = response.val()
+        if (responseFetched) {
+          res.respond('Already registered email', 'already_registered_email', 401)
+          return
+        }
+        usersRef.orderByChild('username').equalTo(username).once('value', function (snapshot) {
+          console.log('Successfully fetched user')
+          var userFetched = snapshot.val()
 
-    usersRef.orderByChild('username').equalTo(username).once('value', function (snapshot) {
-      console.log('Successfully fetched user')
-      var userFetched = snapshot.val()
-
-      if (userFetched) {
-        res.respond('Already registered username', 'already_registered_username', 401)
-        return
-      }
-      if (!userFetched) {
-        var refreshToken = jwt.sign({
-          refresh: username + 'refreshToken'
-        }, process.env.APP_SECRET)
-        usersRef.child(username).update(
-          {
-            points: 0,
-            pointsInv: 10000000000,
-            minerals: 0,
-            gas: 0,
-            refreshToken: refreshToken,
-            username: username,
-            password: hash,
-            mineralsModifier: 1,
-            gasModifier: 1,
-            lastResourcesRefresh: Date.now()
+          if (userFetched) {
+            res.respond('Already registered username', 'already_registered_username', 401)
+            return
           }
+          if (!userFetched) {
+            var refreshToken = jwt.sign({
+              refresh: username + 'refreshToken'
+            }, process.env.APP_SECRET)
+            usersRef.child(username).update(
+              {
+                points: 0,
+                pointsInv: 10000000000,
+                minerals: 0,
+                gas: 0,
+                refreshToken: refreshToken,
+                email: email,
+                username: username,
+                password: hash,
+                mineralsModifier: 1,
+                gasModifier: 1,
+                lastResourcesRefresh: Date.now()
+              }
         )
-        auth.login(req, res)
-      }
-    }, function (errorObject) {
-      console.log('Error fetching user : ' + errorObject)
-    })
+            auth.login(req, res)
+          }
+        }, function (errorObject) {
+          console.log('Error fetching user : ' + errorObject)
+        })
+      })
   },
 
   deleteUser: function (username) {

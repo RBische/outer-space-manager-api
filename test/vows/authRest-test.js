@@ -19,12 +19,12 @@ require('api-easy')
   app.listen(PORT)
 }).next()
 // No special chars accepted
-.post('/auth/create', {'username': 'alan¨è', 'password': 'testpassword'})
+.post('/auth/create', {'username': 'alan¨è', 'password': 'testpassword', 'email': 'alan' + guid() + '@search.com'})
 .expect(401)
 .next()
 
 // 1. Test with dummy user
-.post('/auth/create', {'username': 'alan', 'password': 'testpassword'})
+.post('/auth/create', {'username': 'alan', 'password': 'testpassword', 'email': 'alan' + guid() + '@search.com'})
 .expect('Should correctly create the user', function (err, res, body) {
   assert.ok(err === null)
   var result = JSON.parse(body)
@@ -32,7 +32,7 @@ require('api-easy')
 })
 .expect(200)
 .next()
-.post('/auth/create', {'username': 'alansearch', 'password': 'testpassword'})
+.post('/auth/create', {'username': 'alansearch', 'password': 'testpassword', 'email': 'alan' + guid() + '@search.com'})
 .expect('Should correctly create the user', function (err, res, body) {
   assert.ok(err === null)
   var result = JSON.parse(body)
@@ -50,9 +50,19 @@ require('api-easy')
 .next()
 .post('/auth/login', {'username': 'alan', 'password': 'testpasswor'}).expect(401)
 .next()
-.post('/auth/create', {'username': 'alanee', 'password': 'testpassword'}).expect(200)
+.post('/auth/create', {'username': 'alanee', 'password': 'testpassword', 'email': 'alan' + guid() + '@search.com'}).expect(200)
 .next()
-.post('/auth/create', {'username': 'alanee', 'password': 'testpassword'}).expect(401)
+.post('/auth/create', {'username': 'alanee', 'password': 'testpassword', 'email': 'alan' + guid() + '@search.com'}).expect(401)
 
 // Export tests for Vows
 .export(module)
+
+function guid () {
+  function s4 () {
+    return Math.floor((1 + Math.random()) * 0x10000)
+      .toString(16)
+      .substring(1)
+  }
+  return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+    s4() + '-' + s4() + s4() + s4()
+}
