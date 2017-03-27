@@ -73,7 +73,7 @@ var auth = {
    */
   addDeviceToken: function (req, res) {
     var deviceToken = req.body.deviceToken || ''
-
+    // TODO: Test if the device token is not already inserted
     if (deviceToken === '') {
       res.respond('Invalid request', 'invalid_request', 401)
       return
