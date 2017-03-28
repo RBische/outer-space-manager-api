@@ -5,7 +5,7 @@ var ref = db.ref('outer-space-manager')
 
 var auth = {
 /**
- * @api {get} /api/vXXX/pushme Test push
+ * @api {get} /api/vXXX/devices/pushme Test push
  * @apiDescription Send to the current user a push notification
  * @apiName SendPush
  * @apiGroup Device
