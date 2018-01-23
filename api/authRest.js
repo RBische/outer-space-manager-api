@@ -28,9 +28,9 @@ var auth = {
    * @apiError already_registered_email Already registered email (400)
    */
   create: function (req, res) {
-    var username = req.body.username || ''
-    var password = req.body.password || ''
-    var email = req.body.email || ''
+    var username = req.body.username.trim() || ''
+    var password = req.body.password.trim() || ''
+    var email = req.body.email.trim() || ''
 
     if (username === '' || password === '' || email === '') {
       res.respond('Invalid request', 'invalid_request', 401)
@@ -121,8 +121,8 @@ var auth = {
    * @apiError invalid_credentials The password or the username are wrong (401)
    */
   login: function (req, res) {
-    var username = req.body.username || ''
-    var password = req.body.password || ''
+    var username = req.body.username.trim() || ''
+    var password = req.body.password.trim() || ''
 
     if (username === '' || password === '') {
       res.respond('Invalid credentials', 'invalid_credentials', 401)
