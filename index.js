@@ -18,7 +18,7 @@ var buildings = require('./api/buildingRest.js')
 var searches = require('./api/searchRest.js')
 var app = exports.app = express()
 
-app.set('port', (process.env.PORT || 6000))
+app.set('port', (process.env.PORT || 3005))
 var bodyParser = require('body-parser')
 app.use(bodyParser.json())
 
@@ -37,6 +37,7 @@ app.get('/', function (request, response) {
 */
 router.post('/api/v1/auth/login', auth.login)
 router.post('/api/v1/auth/create', auth.create)
+router.get('/img/:user', userRest.getImage)
 
 // route middleware to verify a token
 router.use(function (req, res, next) {
