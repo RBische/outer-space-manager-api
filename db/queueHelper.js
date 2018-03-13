@@ -15,7 +15,7 @@ var queue = {
       points: points,
       amount: amount || 0
     }
-    queueRef.child(parseInt(executionTime)).update(
+    queueRef.child(parseInt(executionTime / 1000)).update(
       objectToSave, function (error) {
         if (error) {
           console.log('Data in queue could not be saved.' + error)
