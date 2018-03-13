@@ -1,5 +1,5 @@
 const request = require('supertest')
-require('dotenv').config({verbose: true})
+// require('dotenv').config({verbose: true})
 const app = require('../../index')
 const token = require('../../api/authRest').pushToken('alan')
 const test = require('tape')

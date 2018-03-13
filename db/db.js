@@ -1,5 +1,5 @@
 var admin = require('firebase-admin')
-require('dotenv').config({verbose: true})
+// require('dotenv').config({verbose: true})
 var privateKey = Buffer.from(process.env.FIREBASE_PRIVATE_KEY, 'base64').toString('ascii')
 var credentials = {
   'type': process.env.FIREBASE_TYPE,

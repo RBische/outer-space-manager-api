@@ -1,4 +1,4 @@
-require('dotenv').config({verbose: true})
+// require('dotenv').config({verbose: true})
 const PORT = 3000
 var assert = require('assert')
 var app = require('../../index')
