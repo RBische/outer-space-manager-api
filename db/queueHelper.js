@@ -10,7 +10,7 @@ var queue = {
       objectType: objectType,
       object: object,
       key: key,
-      executionTime: parseInt(executionTime),
+      executionTime: parseInt(executionTime / 1000),
       username: username,
       points: points,
       amount: amount || 0
@@ -68,7 +68,7 @@ function executeItems (keys, items, callback) {
     var currentKey = keys.shift()
     var currentItem = items[currentKey]
     console.log('Trying to executeItems', currentItem)
-    if (currentItem.executionTime <= Date.now()) {
+    if (currentItem.executionTime <= Date.now() / 1000) {
       console.log('Executing item : ' + currentItem.executionTime)
       var afterModifying = function () {
         queueRef.child('' + currentItem.executionTime).remove(
