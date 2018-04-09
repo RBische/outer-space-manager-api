@@ -134,14 +134,14 @@ function executeItems (keys, items, callback) {
                       console.log('Update done')
                       executeItems(keys, items, callback)
                     })
-                } else if (currentItem.object.hasOwnProperty('effectAdded') && currentItem.object.hasOwnProperty('level')) {
+                } else if (currentItem.object.hasOwnProperty('effect') && currentItem.object.hasOwnProperty('level')) {
                   ref.child('users/' + currentItem.username).once('value', function (snapshot) {
                     const userToModify = snapshot.val()
                     if (userToModify) {
                       var effect = {}
-                      effect[currentItem.object.effectAdded] = userToModify[currentItem.object.effectAdded] + currentItem.object.amountOfEffectByLevel
+                      effect[currentItem.object.effect] = userToModify[currentItem.object.effect] + currentItem.object.amountOfEffectByLevel
                       console.log(JSON.stringify(effect))
-                      if (effect[currentItem.object.effectAdded]) {
+                      if (effect[currentItem.object.effect]) {
                         ref.child('users/' + currentItem.username).update(effect, function (error) {
                           if (error) {
                             console.log('Effect not added to user : ' + error)
