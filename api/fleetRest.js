@@ -253,6 +253,7 @@ const fleet = {
    *     }
    * @apiError invalid_request Missing shipId or amount (401)
    * @apiError not_enough_resources Not enough resources to build these ships (401)
+   * @apiError insufficient_spaceport_level Insufficient Spaceport level (401)
    * @apiError no_ships_found This ship does not exist (404)
    * @apiError internal_error Something went wrong, try again later (500)
    */
@@ -279,7 +280,6 @@ const fleet = {
     }
   },
   constructShips: function (response, user, shipId, amount) {
-    // TODO: Add control on spatioport level
     return ref.child('ships/' + shipId)
         .once('value')
         .then(function (res) {
@@ -295,6 +295,15 @@ const fleet = {
           return Promise.reject({code: 'InternalError', info: error})
         })
       .then(function (ship) {
+        if (ship.spatioportLevelNeeded > 0 &&
+          (user.buildings === undefined ||
+            user.buildings[1] === undefined ||
+            user.buildings[1].level === undefined ||
+            user.buildings[1].level < ship.spatioportLevelNeeded)
+        ) {
+          response.respond('Insufficient Spaceport level', 'insufficient_spaceport_level', 401)
+          return Promise.reject({code: 'not_enough_resources'})
+        }
         var futureSupposedAmount = amount
         if (ship.amount) {
           futureSupposedAmount = amount + futureSupposedAmount
