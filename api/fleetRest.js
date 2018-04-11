@@ -371,6 +371,7 @@ const fleet = {
       for (var i = 0; i < req.body.ships.length; i++) {
         if (req.body.ships[i].hasOwnProperty('shipId') && req.body.ships[i].hasOwnProperty('amount')) {
           if (req.user.fleet &&
+            req.body.ships[i].amount > 0 &&
             req.user.fleet[req.body.ships[i].shipId] &&
             req.user.fleet[req.body.ships[i].shipId].amount &&
             req.user.fleet[req.body.ships[i].shipId].amount >= req.body.ships[i].amount) {
