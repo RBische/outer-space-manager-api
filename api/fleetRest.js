@@ -258,7 +258,7 @@ const fleet = {
    */
   createShip: function (req, res, next) {
     console.log('Creating ship' + JSON.stringify(req.params))
-    if (req.params.shipId !== undefined && req.body.amount !== undefined) {
+    if (req.params.shipId !== undefined && req.body.amount !== undefined && req.body.amount > 0) {
       console.log(JSON.stringify(userMakingCreateRequest))
       if (!userMakingCreateRequest.includes(req.user.username)) {
         console.log('Going through')
@@ -274,7 +274,7 @@ const fleet = {
         return
       }
     } else {
-      res.respond('Invalid request, no shipId or no amount given', 'invalid_request', 401)
+      res.respond('Invalid request, no shipId or no amount given or bad amount', 'invalid_request', 401)
       return
     }
   },
