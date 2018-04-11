@@ -54,6 +54,7 @@ var search = {
       "mineralCostByLevel": 200,
       "mineralCostLevel0": 100,
       "name": "Recherche robotique",
+      "searchId": 1,
       "timeToBuildByLevel": 200,
       "timeToBuildLevel0": 60
     }
