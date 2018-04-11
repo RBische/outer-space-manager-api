@@ -368,17 +368,19 @@ const fleet = {
       const attackFleet = []
       var minSpeed = 150000
       console.log('Current fleet:' + JSON.stringify(req.user.fleet))
-      for (var i = 0; i < req.body.ships.length; i++) {
+      for (let i = 0; i < req.body.ships.length; i++) {
         if (req.body.ships[i].hasOwnProperty('shipId') && req.body.ships[i].hasOwnProperty('amount')) {
           if (req.user.fleet &&
             req.body.ships[i].amount > 0 &&
             req.user.fleet[req.body.ships[i].shipId] &&
             req.user.fleet[req.body.ships[i].shipId].amount &&
             req.user.fleet[req.body.ships[i].shipId].amount >= req.body.ships[i].amount) {
-            if (req.user.fleet[req.body.ships[i].shipId].speed < minSpeed) {
-              minSpeed = req.user.fleet[req.body.ships[i].shipId].speed
+            if (attackFleet.findIndex( x => x.shipId === req.body.ships[i].shipId) === -1){
+              if (req.user.fleet[req.body.ships[i].shipId].speed < minSpeed) {
+                minSpeed = req.user.fleet[req.body.ships[i].shipId].speed
+              }
+              attackFleet.push({shipId: req.body.ships[i].shipId, amount: req.body.ships[i].amount})
             }
-            attackFleet.push({shipId: req.body.ships[i].shipId, amount: req.body.ships[i].amount})
           }
         }
       }
