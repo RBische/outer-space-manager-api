@@ -302,7 +302,7 @@ const fleet = {
             user.buildings[1].level < ship.spatioportLevelNeeded)
         ) {
           response.respond('Insufficient Spaceport level', 'insufficient_spaceport_level', 401)
-          return Promise.reject({code: 'not_enough_resources'})
+          return Promise.reject({code: 'insufficient_spaceport_level'})
         }
         var futureSupposedAmount = amount
         if (ship.amount) {
