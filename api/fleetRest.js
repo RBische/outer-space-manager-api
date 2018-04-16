@@ -384,7 +384,7 @@ const fleet = {
             req.user.fleet[req.body.ships[i].shipId] &&
             req.user.fleet[req.body.ships[i].shipId].amount &&
             req.user.fleet[req.body.ships[i].shipId].amount >= req.body.ships[i].amount) {
-            if (attackFleet.findIndex( x => x.shipId === req.body.ships[i].shipId) === -1){
+            if (attackFleet.findIndex( x => x.shipId === req.body.ships[i].shipId) === -1) {
               if (req.user.fleet[req.body.ships[i].shipId].speed < minSpeed) {
                 minSpeed = req.user.fleet[req.body.ships[i].shipId].speed
               }
