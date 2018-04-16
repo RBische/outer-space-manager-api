@@ -253,12 +253,13 @@ const fleet = {
    *     }
    * @apiError invalid_request Missing shipId or amount (401)
    * @apiError not_enough_resources Not enough resources to build these ships (401)
+   * @apiError insufficient_spaceport_level Insufficient Spaceport level (401)
    * @apiError no_ships_found This ship does not exist (404)
    * @apiError internal_error Something went wrong, try again later (500)
    */
   createShip: function (req, res, next) {
     console.log('Creating ship' + JSON.stringify(req.params))
-    if (req.params.shipId !== undefined && req.body.amount !== undefined) {
+    if (req.params.shipId !== undefined && req.body.amount !== undefined && req.body.amount > 0) {
       console.log(JSON.stringify(userMakingCreateRequest))
       if (!userMakingCreateRequest.includes(req.user.username)) {
         console.log('Going through')
@@ -274,12 +275,11 @@ const fleet = {
         return
       }
     } else {
-      res.respond('Invalid request, no shipId or no amount given', 'invalid_request', 401)
+      res.respond('Invalid request, no shipId or no amount given or bad amount', 'invalid_request', 401)
       return
     }
   },
   constructShips: function (response, user, shipId, amount) {
-    // TODO: Add control on spatioport level
     return ref.child('ships/' + shipId)
         .once('value')
         .then(function (res) {
@@ -295,6 +295,15 @@ const fleet = {
           return Promise.reject({code: 'InternalError', info: error})
         })
       .then(function (ship) {
+        if (ship.spatioportLevelNeeded > 0 &&
+          (user.buildings === undefined ||
+            user.buildings[1] === undefined ||
+            user.buildings[1].level === undefined ||
+            user.buildings[1].level < ship.spatioportLevelNeeded)
+        ) {
+          response.respond('Insufficient Spaceport level', 'insufficient_spaceport_level', 401)
+          return Promise.reject({code: 'insufficient_spaceport_level'})
+        }
         var futureSupposedAmount = amount
         if (ship.amount) {
           futureSupposedAmount = amount + futureSupposedAmount
@@ -368,16 +377,19 @@ const fleet = {
       const attackFleet = []
       var minSpeed = 150000
       console.log('Current fleet:' + JSON.stringify(req.user.fleet))
-      for (var i = 0; i < req.body.ships.length; i++) {
+      for (let i = 0; i < req.body.ships.length; i++) {
         if (req.body.ships[i].hasOwnProperty('shipId') && req.body.ships[i].hasOwnProperty('amount')) {
           if (req.user.fleet &&
+            req.body.ships[i].amount > 0 &&
             req.user.fleet[req.body.ships[i].shipId] &&
             req.user.fleet[req.body.ships[i].shipId].amount &&
             req.user.fleet[req.body.ships[i].shipId].amount >= req.body.ships[i].amount) {
-            if (req.user.fleet[req.body.ships[i].shipId].speed < minSpeed) {
-              minSpeed = req.user.fleet[req.body.ships[i].shipId].speed
+            if (attackFleet.findIndex(x => x.shipId === req.body.ships[i].shipId) === -1) {
+              if (req.user.fleet[req.body.ships[i].shipId].speed < minSpeed) {
+                minSpeed = req.user.fleet[req.body.ships[i].shipId].speed
+              }
+              attackFleet.push({shipId: req.body.ships[i].shipId, amount: req.body.ships[i].amount})
             }
-            attackFleet.push({shipId: req.body.ships[i].shipId, amount: req.body.ships[i].amount})
           }
         }
       }
